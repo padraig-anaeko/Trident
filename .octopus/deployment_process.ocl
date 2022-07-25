@@ -1,7 +1,7 @@
 step "deploy-trident-website" {
     name = "Deploy Trident Website"
     properties = {
-        Octopus.Action.MaxParallelism = "2"
+        Octopus.Action.MaxParallelism = "1"
         Octopus.Action.TargetRoles = "trident-web"
     }
 
@@ -15,6 +15,9 @@ step "deploy-trident-website" {
                 $machineName = $OctopusParameters["Octopus.Machine.Name"]
                 
                 Write-Host "Remove $machineName from the Load Balancer."
+                
+                Write-Host "Forcing an error because reasons."
+                Exit 1
             EOT
             Octopus.Action.Script.ScriptSource = "Inline"
             Octopus.Action.Script.Syntax = "PowerShell"
