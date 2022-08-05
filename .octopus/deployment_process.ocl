@@ -1,5 +1,5 @@
 step "run-octopus-deploy-runbook" {
-    name = "Run Octopus Deploy Runbook"
+    name = "Run Create Trident Database Runbook"
 
     action {
         properties = {
