@@ -1,3 +1,29 @@
+step "run-octopus-deploy-runbook" {
+    name = "Run Octopus Deploy Runbook"
+
+    action {
+        properties = {
+            Octopus.Action.RunOnServer = "true"
+            Octopus.Action.Template.Id = "ActionTemplates-23"
+            Octopus.Action.Template.Version = "13"
+            Run.Runbook.Api.Key = "#{Project.Runbook.Api.Key}"
+            Run.Runbook.AutoApproveManualInterventions = "No"
+            Run.Runbook.Base.Url = "#{Octopus.Web.ServerUri}"
+            Run.Runbook.CancelInSeconds = "1800"
+            Run.Runbook.DateTime = "N/A"
+            Run.Runbook.Environment.Name = "#{Octopus.Environment.Name}"
+            Run.Runbook.Machines = "N/A"
+            Run.Runbook.ManualIntervention.EnvironmentToUse = "#{Octopus.Environment.Name}"
+            Run.Runbook.Name = "Create Trident Database"
+            Run.Runbook.Project.Name = "Trident"
+            Run.Runbook.Space.Name = "#{Octopus.Space.Name}"
+            Run.Runbook.UsePublishedSnapShot = "True"
+            Run.Runbook.Waitforfinish = "True"
+        }
+        worker_pool = "hosted-windows"
+    }
+}
+
 step "deploy-trident-website" {
     name = "Deploy Trident Website"
     properties = {
@@ -93,32 +119,6 @@ step "send-slack-message-on-failure" {
             ssn_Message = "#{Notification.Body.Text}"
             ssn_Title = "#{Notification.Subject.Text}"
             ssn_Username = "Trident Project in Octopus Deploy"
-        }
-        worker_pool = "hosted-windows"
-    }
-}
-
-step "run-octopus-deploy-runbook" {
-    name = "Run Octopus Deploy Runbook"
-
-    action {
-        properties = {
-            Octopus.Action.RunOnServer = "true"
-            Octopus.Action.Template.Id = "ActionTemplates-23"
-            Octopus.Action.Template.Version = "13"
-            Run.Runbook.Api.Key = "#{Project.Runbook.Api.Key}"
-            Run.Runbook.AutoApproveManualInterventions = "No"
-            Run.Runbook.Base.Url = "#{Octopus.Web.ServerUri}"
-            Run.Runbook.CancelInSeconds = "1800"
-            Run.Runbook.DateTime = "N/A"
-            Run.Runbook.Environment.Name = "#{Octopus.Environment.Name}"
-            Run.Runbook.Machines = "N/A"
-            Run.Runbook.ManualIntervention.EnvironmentToUse = "#{Octopus.Environment.Name}"
-            Run.Runbook.Name = "Create Trident Database"
-            Run.Runbook.Project.Name = "Trident"
-            Run.Runbook.Space.Name = "#{Octopus.Space.Name}"
-            Run.Runbook.UsePublishedSnapShot = "True"
-            Run.Runbook.Waitforfinish = "True"
         }
         worker_pool = "hosted-windows"
     }
