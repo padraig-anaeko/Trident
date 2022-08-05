@@ -17,11 +17,19 @@ namespace Octopus.Trident.Database.DbUp
 
             connectionString = connectionString.Substring(connectionString.IndexOf("=") + 1).Replace(@"""", string.Empty);
 
+            var executingPath = Assembly.GetExecutingAssembly().Location.Replace("Octopus.Trident.Database.DbUp", "").Replace(".dll", "").Replace(".exe", "");
+            Console.WriteLine($"The execution location is {executingPath}");
+
+            var deploymentScriptPath = Path.Combine(executingPath, "DeploymentScripts");
+            Console.WriteLine($"The deployment script path is located at {deploymentScriptPath}");
+
+            var postDeploymentScriptsPath = Path.Combine(executingPath, "PostDeploymentScripts");
+            Console.WriteLine($"The deployment script path is located at {postDeploymentScriptsPath}");
+
             var upgradeEngineBuilder = DeployChanges.To
-                .SqlDatabase(connectionString, null)
-                .WithScriptsEmbeddedInAssembly(Assembly.GetExecutingAssembly(), x => x.StartsWith("Octopus.Trident.Database.DbUp.BeforeDeploymentScripts."), new SqlScriptOptions { ScriptType = ScriptType.RunAlways, RunGroupOrder = 0 })
-                .WithScriptsEmbeddedInAssembly(Assembly.GetExecutingAssembly(), x => x.StartsWith("Octopus.Trident.Database.DbUp.DeploymentScripts"), new SqlScriptOptions { ScriptType = ScriptType.RunOnce, RunGroupOrder = 1 })
-                .WithScriptsEmbeddedInAssembly(Assembly.GetExecutingAssembly(), x => x.StartsWith("Octopus.Trident.Database.DbUp.PostDeploymentScripts."), new SqlScriptOptions { ScriptType = ScriptType.RunAlways, RunGroupOrder = 2 })
+                .SqlDatabase(connectionString, null)                
+                .WithScriptsFromFileSystem(deploymentScriptPath, new SqlScriptOptions { ScriptType = ScriptType.RunOnce, RunGroupOrder = 1 })
+                .WithScriptsFromFileSystem(postDeploymentScriptsPath, new SqlScriptOptions { ScriptType = ScriptType.RunAlways, RunGroupOrder = 2 })
                 .WithTransactionPerScript()
                 .LogToConsole();
 
@@ -35,7 +43,17 @@ namespace Octopus.Trident.Database.DbUp
                 var report = args.FirstOrDefault(x => x.StartsWith("--PreviewReportPath", StringComparison.OrdinalIgnoreCase));
                 report = report.Substring(report.IndexOf("=") + 1).Replace(@"""", string.Empty);
 
+                if (Directory.Exists(report) == false)
+                {
+                    Directory.CreateDirectory(report);
+                }
+
                 var fullReportPath = Path.Combine(report, "UpgradeReport.html");
+
+                if (File.Exists(fullReportPath) == true)
+                {
+                    File.Delete(fullReportPath);
+                }
 
                 Console.WriteLine($"Generating the report at {fullReportPath}");
                 
