@@ -35,7 +35,7 @@ step "generate-database-delta-report" {
                 $packagePath = $OctopusParameters["Octopus.Action.Package[Trident.Database].ExtractedPath"]
                 $connectionString = $OctopusParameters["Project.Connection.String"]
                 $environmentName = $OctopusParameters["Octopus.Environment.Name"]
-                $reportPath = "C:\DatabaseReports\$environmentName"
+                $reportPath = $OctopusParameters["Project.Database.Report.Path"]
                 
                 cd $packagePath
                 $appToRun = ".\Octopus.Trident.Database.DbUp"
@@ -60,6 +60,22 @@ step "generate-database-delta-report" {
                 SelectionMode = "immediate"
             }
         }
+    }
+}
+
+step "auto-approve-database-delta-script" {
+    name = "Auto-Approve Database Delta Script"
+
+    action {
+        properties = {
+            Databases.AutoApproval.ReportPath = "#{Project.Database.Report.Path}"
+            Databases.AutoApprove.CommandsIndicatingChange = "#{SQL.Verification.Change.List}"
+            Databases.AutoApprove.CommandsRequireApproval = "#{SQL.Verification.Command.List}"
+            Octopus.Action.RunOnServer = "true"
+            Octopus.Action.Template.Id = "ActionTemplates-41"
+            Octopus.Action.Template.Version = "0"
+        }
+        worker_pool = "hosted-windows"
     }
 }
 
@@ -210,19 +226,6 @@ step "send-slack-message-on-failure" {
             ssn_Message = "#{Notification.Body.Text}"
             ssn_Title = "#{Notification.Subject.Text}"
             ssn_Username = "Trident Project in Octopus Deploy"
-        }
-        worker_pool = "hosted-windows"
-    }
-}
-
-step "auto-approve-database-delta-script" {
-    name = "Auto-Approve Database Delta Script"
-
-    action {
-        properties = {
-            Octopus.Action.RunOnServer = "true"
-            Octopus.Action.Template.Id = "ActionTemplates-41"
-            Octopus.Action.Template.Version = "0"
         }
         worker_pool = "hosted-windows"
     }
