@@ -15,7 +15,7 @@ step "run-octopus-deploy-runbook" {
     condition = "Variable"
     name = "Run Create Trident Database Runbook"
     properties = {
-        Octopus.Step.ConditionVariableExpression = "#{unless Octopus.Deployment.Error}#{Octopus.Action[Calculate Deployment Mode].Output.RunOnDeploy}#{/unless}"
+        Octopus.Step.ConditionVariableExpression = "#{unless Octopus.Deployment.Error}#{Project.Database.RunOnDeploy}#{/unless}"
     }
 
     action {
@@ -45,7 +45,7 @@ step "generate-database-delta-report" {
     condition = "Variable"
     name = "Generate Database Delta Report"
     properties = {
-        Octopus.Step.ConditionVariableExpression = "#{unless Octopus.Deployment.Error}#{Octopus.Action[Calculate Deployment Mode].Output.RunOnDeploy}#{/unless}"
+        Octopus.Step.ConditionVariableExpression = "#{unless Octopus.Deployment.Error}#{Project.Database.RunOnDeploy}#{/unless}"
     }
 
     action {
@@ -88,7 +88,7 @@ step "auto-approve-database-delta-script" {
     condition = "Variable"
     name = "Auto-Approve Database Delta Script"
     properties = {
-        Octopus.Step.ConditionVariableExpression = "#{unless Octopus.Deployment.Error}#{Octopus.Action[Calculate Deployment Mode].Output.RunOnDeploy}#{/unless}"
+        Octopus.Step.ConditionVariableExpression = "#{unless Octopus.Deployment.Error}#{Project.Database.RunOnDeploy}#{/unless}"
     }
 
     action {
@@ -126,7 +126,7 @@ step "deploy-the-database-changes" {
     condition = "Variable"
     name = "Deploy the Database Changes"
     properties = {
-        Octopus.Step.ConditionVariableExpression = "#{unless Octopus.Deployment.Error}#{Octopus.Action[Calculate Deployment Mode].Output.RunOnDeploy}#{/unless}"
+        Octopus.Step.ConditionVariableExpression = "#{unless Octopus.Deployment.Error}#{Project.Database.RunOnDeploy}#{/unless}"
     }
 
     action {
