@@ -118,7 +118,7 @@ step "auto-approve-database-delta-script" {
             Databases.AutoApprove.CommandsRequireApproval = "#{SQL.Verification.Command.List}"
             Octopus.Action.RunOnServer = "true"
             Octopus.Action.Template.Id = "ActionTemplates-41"
-            Octopus.Action.Template.Version = "0"
+            Octopus.Action.Template.Version = "1"
         }
         worker_pool = "hosted-windows"
     }
