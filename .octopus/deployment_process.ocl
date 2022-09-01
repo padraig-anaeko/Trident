@@ -16,21 +16,6 @@ step "calculate-deployment-mode" {
     }
 }
 
-step "enable-maintenance-mode" {
-    name = "Enable Maintenance Mode"
-
-    action {
-        action_type = "Octopus.Script"
-        properties = {
-            Octopus.Action.RunOnServer = "true"
-            Octopus.Action.Script.ScriptBody = "Write-Highlight \"Enabling Maintenance Mode\""
-            Octopus.Action.Script.ScriptSource = "Inline"
-            Octopus.Action.Script.Syntax = "PowerShell"
-        }
-        worker_pool = "hosted-windows"
-    }
-}
-
 step "run-octopus-deploy-runbook" {
     condition = "Variable"
     name = "Run Create Trident Database Runbook"
@@ -148,7 +133,6 @@ step "approve-database-delta-script" {
 
     action {
         action_type = "Octopus.Manual"
-        environments = ["staging"]
         notes = <<-EOT
                 **Runs on Deployments Only**
                 
@@ -206,14 +190,38 @@ step "deploy-the-database-changes" {
     }
 }
 
-step "deploy-trident-web" {
-    name = "Deploy Trident.Web"
+step "deploy-trident-website" {
+    name = "Deploy Trident Website"
     properties = {
+        Octopus.Action.MaxParallelism = "1"
         Octopus.Action.TargetRoles = "trident-web"
     }
 
-    action {
+    action "remove-from-load-balancer" {
+        action_type = "Octopus.Script"
+        environments = ["staging", "production"]
+        name = "Remove from Load Balancer"
+        notes = <<-EOT
+                **Always runs**
+                
+                Removes a specific server from the load balancer.
+            EOT
+        properties = {
+            Octopus.Action.RunOnServer = "true"
+            Octopus.Action.Script.ScriptBody = <<-EOT
+                $machineName = $OctopusParameters["Octopus.Machine.Name"]
+                
+                Write-Host "Remove $machineName from the Load Balancer."
+            EOT
+            Octopus.Action.Script.ScriptSource = "Inline"
+            Octopus.Action.Script.Syntax = "PowerShell"
+        }
+        worker_pool = "hosted-windows"
+    }
+
+    action "deploy-trident-web" {
         action_type = "Octopus.TentaclePackage"
+        name = "Deploy Trident.Web"
         notes = <<-EOT
                 **Always runs**
                 
@@ -237,56 +245,47 @@ step "deploy-trident-web" {
             }
         }
     }
-}
 
-step "block-release-progression" {
-    condition = "Variable"
-    name = "Block Release Progression"
-    properties = {
-        Octopus.Step.ConditionVariableExpression = "#{unless Octopus.Deployment.Error}#{Octopus.Action[Calculate Deployment Mode].Output.RunOnRollback}#{/unless}"
-    }
-
-    action {
-        properties = {
-            Block.Octopus.Api.Key = "#{Project.Runbook.Api.Key}"
-            Block.Octopus.Previous.Release.Id = "#{Octopus.Release.PreviousForEnvironment.Number}"
-            Block.Octopus.Reason = "The deployment failed verification and we needed to rollback"
-            Block.Octopus.Url = "#{Octopus.Web.BaseUrl}"
-            Octopus.Action.RunOnServer = "true"
-            Octopus.Action.Template.Id = "ActionTemplates-62"
-            Octopus.Action.Template.Version = "1"
-        }
-        worker_pool_variable = ""
-    }
-}
-
-step "verify-application" {
-    name = "Verify Application"
-
-    action {
-        action_type = "Octopus.Manual"
-        channels = ["hotfix"]
-        properties = {
-            Octopus.Action.Manual.BlockConcurrentDeployments = "True"
-            Octopus.Action.Manual.Instructions = "Please verify the application before disabling maintenance mode."
-            Octopus.Action.Manual.ResponsibleTeamIds = "qa,global/octopus-managers"
-        }
-        worker_pool_variable = ""
-    }
-}
-
-step "disable-maintenance-mode" {
-    name = "Disable Maintenance Mode"
-
-    action {
+    action "add-to-load-balancer" {
         action_type = "Octopus.Script"
+        environments = ["staging", "production"]
+        name = "Add to Load Balancer"
+        notes = <<-EOT
+                **Always runs**
+                
+                Adds a specific server from the load balancer.
+            EOT
         properties = {
             Octopus.Action.RunOnServer = "true"
-            Octopus.Action.Script.ScriptBody = "Write-Highlight \"Disabling Maintenance Mode\""
+            Octopus.Action.Script.ScriptBody = <<-EOT
+                $machineName = $OctopusParameters["Octopus.Machine.Name"]
+                
+                Write-Host "Adding $machineName back to the load balancer."
+            EOT
             Octopus.Action.Script.ScriptSource = "Inline"
             Octopus.Action.Script.Syntax = "PowerShell"
         }
         worker_pool = "hosted-windows"
+    }
+}
+
+step "notify-developers-of-status" {
+    condition = "Always"
+    name = "Notify Developers of Status"
+
+    action {
+        action_type = "Octopus.Email"
+        notes = <<-EOT
+                **Always runs**
+                
+                Sends a notification message to anyone in the Trident Notifications email group letting them know the status of this deployment.
+            EOT
+        properties = {
+            Octopus.Action.Email.Body = "#{Notification.Body.Text}"
+            Octopus.Action.Email.Subject = "#{Notification.Subject.Text}"
+            Octopus.Action.Email.ToTeamIds = "trident-notifications"
+        }
+        worker_pool_variable = ""
     }
 }
 
@@ -313,25 +312,5 @@ step "send-slack-message-on-failure" {
             ssn_Username = "Trident Project in Octopus Deploy"
         }
         worker_pool = "hosted-windows"
-    }
-}
-
-step "notify-developers-of-status" {
-    condition = "Always"
-    name = "Notify Developers of Status"
-
-    action {
-        action_type = "Octopus.Email"
-        notes = <<-EOT
-                **Always runs**
-                
-                Sends a notification message to anyone in the Trident Notifications email group letting them know the status of this deployment.
-            EOT
-        properties = {
-            Octopus.Action.Email.Body = "#{Notification.Body.Text}"
-            Octopus.Action.Email.Subject = "#{Notification.Subject.Text}"
-            Octopus.Action.Email.ToTeamIds = "trident-notifications"
-        }
-        worker_pool_variable = ""
     }
 }
