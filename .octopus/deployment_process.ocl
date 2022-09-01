@@ -239,6 +239,27 @@ step "deploy-trident-web" {
     }
 }
 
+step "block-release-progression" {
+    condition = "Variable"
+    name = "Block Release Progression"
+    properties = {
+        Octopus.Step.ConditionVariableExpression = "#{unless Octopus.Deployment.Error}#{Octopus.Action[Calculate Deployment Mode].Output.RunOnRollback}#{/unless}"
+    }
+
+    action {
+        properties = {
+            Block.Octopus.Api.Key = "#{Project.Runbook.Api.Key}"
+            Block.Octopus.Previous.Release.Id = "#{Octopus.Release.PreviousForEnvironment.Number}"
+            Block.Octopus.Reason = "The deployment failed verification and we needed to rollback"
+            Block.Octopus.Url = "#{Octopus.Web.BaseUrl}"
+            Octopus.Action.RunOnServer = "true"
+            Octopus.Action.Template.Id = "ActionTemplates-62"
+            Octopus.Action.Template.Version = "1"
+        }
+        worker_pool_variable = ""
+    }
+}
+
 step "verify-application" {
     name = "Verify Application"
 
