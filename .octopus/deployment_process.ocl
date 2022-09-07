@@ -21,6 +21,11 @@ step "enable-maintenance-mode" {
 
     action {
         action_type = "Octopus.Script"
+        notes = <<-EOT
+                **Always Runs**
+                
+                Runs a script that will redirect all traffic to a maintenance page during the deployment.  Engineers will need to access the site via IP address or specific host name.
+            EOT
         properties = {
             Octopus.Action.RunOnServer = "true"
             Octopus.Action.Script.ScriptBody = "Write-Highlight \"Enable Maintenance Mode.\""
@@ -245,6 +250,11 @@ step "verify-trident-application" {
     action {
         action_type = "Octopus.Manual"
         channels = ["hotfix"]
+        notes = <<-EOT
+                **Always Runs for the Release channel**
+                
+                Pauses the deployment and allows for a quick sanity check of the application before disabling maintenance mode.  
+            EOT
         properties = {
             Octopus.Action.Manual.BlockConcurrentDeployments = "False"
             Octopus.Action.Manual.Instructions = "Please verify the Trident application"
@@ -259,6 +269,13 @@ step "disable-the-maintenance-mode" {
 
     action {
         action_type = "Octopus.Script"
+        notes = <<-EOT
+                **Always Runs**
+                
+                Runs a script that will disable the traffic redirect.
+                
+                **Please Note**: If the deployment fails, this step will not run and the application will continue to be in maintenance mode.
+            EOT
         properties = {
             Octopus.Action.RunOnServer = "true"
             Octopus.Action.Script.ScriptBody = "Write-Highlight \"Disable Maintenance Mode\""
