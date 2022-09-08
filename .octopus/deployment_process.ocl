@@ -1,7 +1,54 @@
-step "run-octopus-deploy-runbook" {
-    name = "Run Create Trident Database Runbook"
+step "calculate-deployment-mode" {
+    name = "Calculate Deployment Mode"
 
     action {
+        notes = <<-EOT
+                **Always Runs**
+                
+                Determines if the deployment is a deployment, a rollback, or a redeployment.
+            EOT
+        properties = {
+            Octopus.Action.RunOnServer = "true"
+            Octopus.Action.Template.Id = "ActionTemplates-61"
+            Octopus.Action.Template.Version = "5"
+        }
+        worker_pool_variable = ""
+    }
+}
+
+step "enable-maintenance-mode" {
+    name = "Enable Maintenance Mode"
+
+    action {
+        action_type = "Octopus.Script"
+        notes = <<-EOT
+                **Always Runs**
+                
+                Runs a script that will redirect all traffic to a maintenance page during the deployment.  Engineers will need to access the site via IP address or specific host name.
+            EOT
+        properties = {
+            Octopus.Action.RunOnServer = "true"
+            Octopus.Action.Script.ScriptBody = "Write-Highlight \"Enable Maintenance Mode.\""
+            Octopus.Action.Script.ScriptSource = "Inline"
+            Octopus.Action.Script.Syntax = "PowerShell"
+        }
+        worker_pool = "hosted-windows"
+    }
+}
+
+step "run-octopus-deploy-runbook" {
+    condition = "Variable"
+    name = "Run Create Trident Database Runbook"
+    properties = {
+        Octopus.Step.ConditionVariableExpression = "#{unless Octopus.Deployment.Error}#{Project.Database.RunOnDeploy}#{/unless}"
+    }
+
+    action {
+        notes = <<-EOT
+                **Runs on Deployments Only**
+                
+                Runs the runbook to create the trident database on the current environment's infrastructure.  This can run multiple times, as it checks to see if the database already exists.
+            EOT
         properties = {
             Octopus.Action.RunOnServer = "true"
             Octopus.Action.Template.Id = "ActionTemplates-23"
@@ -17,6 +64,7 @@ step "run-octopus-deploy-runbook" {
             Run.Runbook.Name = "Create Trident Database"
             Run.Runbook.Project.Name = "Trident"
             Run.Runbook.Space.Name = "#{Octopus.Space.Name}"
+            Run.Runbook.Tenant.Name = "#{Octopus.Deployment.Tenant.Name}"
             Run.Runbook.UsePublishedSnapShot = "True"
             Run.Runbook.Waitforfinish = "True"
         }
@@ -25,10 +73,19 @@ step "run-octopus-deploy-runbook" {
 }
 
 step "generate-database-delta-report" {
+    condition = "Variable"
     name = "Generate Database Delta Report"
+    properties = {
+        Octopus.Step.ConditionVariableExpression = "#{unless Octopus.Deployment.Error}#{Project.Database.RunOnDeploy}#{/unless}"
+    }
 
     action {
         action_type = "Octopus.Script"
+        notes = <<-EOT
+                **Runs on Deployments Only**
+                
+                Step that will generate a delta script report that can be downloaded by the DBAs during the manual intervention step. 
+            EOT
         properties = {
             Octopus.Action.RunOnServer = "true"
             Octopus.Action.Script.ScriptBody = <<-EOT
@@ -64,16 +121,25 @@ step "generate-database-delta-report" {
 }
 
 step "auto-approve-database-delta-script" {
+    condition = "Variable"
     name = "Auto-Approve Database Delta Script"
+    properties = {
+        Octopus.Step.ConditionVariableExpression = "#{unless Octopus.Deployment.Error}#{Project.Database.RunOnDeploy}#{/unless}"
+    }
 
     action {
+        notes = <<-EOT
+                **Runs on Deployments Only**
+                
+                Step that will check to see if the delta report has any commands requiring a DBA to approve the changes.
+            EOT
         properties = {
             Databases.AutoApproval.ReportPath = "#{Project.Database.Report.Path}\\UpgradeReport.html"
             Databases.AutoApprove.CommandsIndicatingChange = "#{SQL.Verification.Change.List}"
             Databases.AutoApprove.CommandsRequireApproval = "#{SQL.Verification.Command.List}"
             Octopus.Action.RunOnServer = "true"
             Octopus.Action.Template.Id = "ActionTemplates-41"
-            Octopus.Action.Template.Version = "0"
+            Octopus.Action.Template.Version = "2"
         }
         worker_pool = "hosted-windows"
     }
@@ -88,6 +154,12 @@ step "approve-database-delta-script" {
 
     action {
         action_type = "Octopus.Manual"
+        environments = ["staging"]
+        notes = <<-EOT
+                **Runs on Deployments Only**
+                
+                Manual intervention, it will pause the deployment and wait until the DBAs have approved the delta report.
+            EOT
         properties = {
             Octopus.Action.Manual.BlockConcurrentDeployments = "True"
             Octopus.Action.Manual.Instructions = "Please approve the database delta script found in the artifacts section."
@@ -98,10 +170,19 @@ step "approve-database-delta-script" {
 }
 
 step "deploy-the-database-changes" {
+    condition = "Variable"
     name = "Deploy the Database Changes"
+    properties = {
+        Octopus.Step.ConditionVariableExpression = "#{unless Octopus.Deployment.Error}#{Project.Database.RunOnDeploy}#{/unless}"
+    }
 
     action {
         action_type = "Octopus.Script"
+        notes = <<-EOT
+                **Runs on Deployments Only**
+                
+                Step to deploy the actual database changes to SQL Server.
+            EOT
         properties = {
             Octopus.Action.RunOnServer = "true"
             Octopus.Action.Script.ScriptBody = <<-EOT
@@ -131,33 +212,19 @@ step "deploy-the-database-changes" {
     }
 }
 
-step "deploy-trident-website" {
-    name = "Deploy Trident Website"
+step "deploy-trident-web" {
+    name = "Deploy Trident.Web"
     properties = {
-        Octopus.Action.MaxParallelism = "1"
         Octopus.Action.TargetRoles = "trident-web"
     }
 
-    action "remove-from-load-balancer" {
-        action_type = "Octopus.Script"
-        environments = ["staging", "production"]
-        name = "Remove from Load Balancer"
-        properties = {
-            Octopus.Action.RunOnServer = "true"
-            Octopus.Action.Script.ScriptBody = <<-EOT
-                $machineName = $OctopusParameters["Octopus.Machine.Name"]
-                
-                Write-Host "Remove $machineName from the Load Balancer."
-            EOT
-            Octopus.Action.Script.ScriptSource = "Inline"
-            Octopus.Action.Script.Syntax = "PowerShell"
-        }
-        worker_pool = "hosted-windows"
-    }
-
-    action "deploy-trident-web" {
+    action {
         action_type = "Octopus.TentaclePackage"
-        name = "Deploy Trident.Web"
+        notes = <<-EOT
+                **Always runs**
+                
+                Step to deploy the code and replace the specific configuration values in the appSettings.json file.
+            EOT
         properties = {
             Octopus.Action.EnabledFeatures = "Octopus.Features.JsonConfigurationVariables"
             Octopus.Action.Package.DownloadOnTentacle = "False"
@@ -176,18 +243,43 @@ step "deploy-trident-website" {
             }
         }
     }
+}
 
-    action "add-to-load-balancer" {
+step "verify-trident-application" {
+    name = "Verify Trident Application"
+
+    action {
+        action_type = "Octopus.Manual"
+        channels = ["hotfix"]
+        notes = <<-EOT
+                **Always Runs for the Release channel**
+                
+                Pauses the deployment and allows for a quick sanity check of the application before disabling maintenance mode.  
+            EOT
+        properties = {
+            Octopus.Action.Manual.BlockConcurrentDeployments = "False"
+            Octopus.Action.Manual.Instructions = "Please verify the Trident application"
+            Octopus.Action.Manual.ResponsibleTeamIds = "developers,global/octopus-managers,qa"
+        }
+        worker_pool_variable = ""
+    }
+}
+
+step "disable-the-maintenance-mode" {
+    name = "Disable the Maintenance Mode"
+
+    action {
         action_type = "Octopus.Script"
-        environments = ["staging", "production"]
-        name = "Add to Load Balancer"
+        notes = <<-EOT
+                **Always Runs**
+                
+                Runs a script that will disable the traffic redirect.
+                
+                **Please Note**: If the deployment fails, this step will not run and the application will continue to be in maintenance mode.
+            EOT
         properties = {
             Octopus.Action.RunOnServer = "true"
-            Octopus.Action.Script.ScriptBody = <<-EOT
-                $machineName = $OctopusParameters["Octopus.Machine.Name"]
-                
-                Write-Host "Adding $machineName back to the load balancer."
-            EOT
+            Octopus.Action.Script.ScriptBody = "Write-Highlight \"Disable Maintenance Mode\""
             Octopus.Action.Script.ScriptSource = "Inline"
             Octopus.Action.Script.Syntax = "PowerShell"
         }
@@ -201,6 +293,11 @@ step "notify-developers-of-status" {
 
     action {
         action_type = "Octopus.Email"
+        notes = <<-EOT
+                **Always runs**
+                
+                Sends a notification message to anyone in the Trident Notifications email group letting them know the status of this deployment.
+            EOT
         properties = {
             Octopus.Action.Email.Body = "#{Notification.Body.Text}"
             Octopus.Action.Email.Subject = "#{Notification.Subject.Text}"
@@ -215,6 +312,11 @@ step "send-slack-message-on-failure" {
     name = "Send Slack Message on Failure"
 
     action {
+        notes = <<-EOT
+                **Always runs on failure**
+                
+                Sends a slack message to the trident-deployment-notifications channel when a failure occurs.
+            EOT
         properties = {
             Octopus.Action.RunOnServer = "true"
             Octopus.Action.Template.Id = "ActionTemplates-1"
