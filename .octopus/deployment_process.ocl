@@ -128,6 +128,7 @@ step "auto-approve-database-delta-script" {
     }
 
     action {
+        environments = ["staging"]
         notes = <<-EOT
                 **Runs on Deployments Only**
                 
@@ -141,6 +142,7 @@ step "auto-approve-database-delta-script" {
             Octopus.Action.Template.Id = "ActionTemplates-41"
             Octopus.Action.Template.Version = "2"
         }
+        tenant_tags = ["Branch Type/Pseudo"]
         worker_pool = "hosted-windows"
     }
 }
@@ -165,6 +167,7 @@ step "approve-database-delta-script" {
             Octopus.Action.Manual.Instructions = "Please approve the database delta script found in the artifacts section."
             Octopus.Action.Manual.ResponsibleTeamIds = "dbas,global/octopus-managers"
         }
+        tenant_tags = ["Branch Type/Pseudo"]
         worker_pool_variable = ""
     }
 }
