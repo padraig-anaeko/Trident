@@ -43,3 +43,9 @@ variable "Project.Database.Report.Path" {
 variable "Project.Database.RunOnDeploy" {
     value "#{Octopus.Action[Calculate Deployment Mode].Output.RunOnDeploy}" {}
 }
+
+variable "Project.Certificate" {
+    type = "Certificate"
+
+    value "Certificates-1" {}
+}
