@@ -49,3 +49,9 @@ variable "Project.Certificate" {
 
     value "Certificates-1" {}
 }
+
+variable "Project.Workerpools" {
+    type = "WorkerPool"
+
+    value "hosted-windows" {}
+}
