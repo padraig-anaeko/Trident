@@ -108,7 +108,7 @@ step "auto-approve-database-delta-script" {
     }
 
     action {
-        environments = ["staging"]
+        environments = ["staging-blue", "staging-green"]
         notes = <<-EOT
                 **Runs on Deployments Only**
                 
@@ -136,7 +136,7 @@ step "approve-database-delta-script" {
 
     action {
         action_type = "Octopus.Manual"
-        environments = ["staging"]
+        environments = ["staging-blue", "staging-green"]
         notes = <<-EOT
                 **Runs on Deployments Only**
                 
@@ -233,11 +233,17 @@ step "verify-application" {
 
     action {
         action_type = "Octopus.Script"
+        notes = <<-EOT
+                **Always Runs**
+                
+                This step will run a series of tests to ensure the application is running correctly.  If it fails, the guided failure mode will run, where you can manually override the failure and proceed, retry the tests, or fail the deployment.
+            EOT
         properties = {
             Octopus.Action.RunOnServer = "true"
             Octopus.Action.Script.ScriptBody = <<-EOT
                 $randomNumber = Get-Random -Minimum 1 -Maximum 100
                 
+                Write-Host "The random number is $randomNumber.  If it is above 90, this will fail the step."
                 if ($randomNumber -ge 90)
                 {
                 	Write-Host "An error occurred verifying the application."
@@ -256,6 +262,7 @@ step "disable-the-maintenance-mode" {
 
     action {
         action_type = "Octopus.Script"
+        channels = ["hotfix"]
         notes = <<-EOT
                 **Always Runs**
                 
