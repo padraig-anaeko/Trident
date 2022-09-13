@@ -10,17 +10,6 @@ variable "Project.Database.ApprovalRequired" {
     value "#{Octopus.Action[Auto-Approve Database Delta Script].Output.ApprovalRequired}" {}
 }
 
-variable "Project.Database.Name" {
-    value "Trident_#{Octopus.Environment.Name}_#{Retail.Tenant.ShortName}" {
-        description = ""
-        environment = ["development", "qa", "staging"]
-    }
-
-    value "Trident_#{Retail.Tenant.ShortName}" {
-        environment = ["production", "production-blue", "production-green"]
-    }
-}
-
 variable "Project.Database.Report.Path" {
     value "C:\\DatabaseReports\\#{Octopus.Environment.Name}" {}
 }
@@ -53,5 +42,19 @@ variable "Octopus.ServiceNow.ChangeRequest.Number" {
             }
             label = "ServiceNow Change Request"
         }
+    }
+}
+
+variable "Project.Database.Name" {
+    value "Trident_#{Octopus.Environment.Name}_#{Retail.Tenant.ShortName}" {
+        description = ""
+        environment = ["development", "qa"]
+    }
+
+    value "Trident_#{Retail.Tenant.ShortName}" {}
+
+    value "Trident_Staging_#{Retail.Tenant.ShortName}" {
+        description = ""
+        environment = ["staging-blue", "staging-green", "staging"]
     }
 }
