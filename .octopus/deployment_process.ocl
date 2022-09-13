@@ -262,7 +262,7 @@ step "disable-the-maintenance-mode" {
 
     action {
         action_type = "Octopus.Script"
-        channels = ["release"]
+        channels = ["hotfix"]
         notes = <<-EOT
                 **Always Runs**
                 
