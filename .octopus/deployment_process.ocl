@@ -262,7 +262,7 @@ step "disable-the-maintenance-mode" {
 
     action {
         action_type = "Octopus.Script"
-        channels = ["release-blue-green"]
+        channels = ["release"]
         notes = <<-EOT
                 **Always Runs**
                 
