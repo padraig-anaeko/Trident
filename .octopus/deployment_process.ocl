@@ -108,7 +108,7 @@ step "auto-approve-database-delta-script" {
     }
 
     action {
-        environments = ["staging"]
+        environments = ["staging-blue", "staging-green"]
         notes = <<-EOT
                 **Runs on Deployments Only**
                 
@@ -136,7 +136,7 @@ step "approve-database-delta-script" {
 
     action {
         action_type = "Octopus.Manual"
-        environments = ["staging"]
+        environments = ["staging-blue", "staging-green"]
         notes = <<-EOT
                 **Runs on Deployments Only**
                 
