@@ -48,7 +48,7 @@ step "run-octopus-deploy-runbook" {
             Run.Runbook.UsePublishedSnapShot = "True"
             Run.Runbook.Waitforfinish = "True"
         }
-        worker_pool = "hosted-windows"
+        worker_pool = "hosted-ubuntu"
     }
 }
 
