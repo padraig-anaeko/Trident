@@ -262,6 +262,11 @@ step "call-the-canary-deployment-runbook" {
 
     action {
         channels = ["hotfix"]
+        notes = <<-EOT
+                **Always Runs**
+                
+                Call the runbook to update the load balancer slowly instead of swapping 100% of all incoming traffic to the new version of the code.
+            EOT
         properties = {
             Octopus.Action.RunOnServer = "true"
             Octopus.Action.Template.Id = "ActionTemplates-81"
