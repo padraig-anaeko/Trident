@@ -288,7 +288,6 @@ step "update-load-balancer" {
                 Project.Loadbalancer.WaitInMinutes::#{Project.Loadbalancer.WaitInMinutes}
             EOT
             Run.Runbook.Space.Name = "#{Octopus.Space.Name}"
-            Run.Runbook.Tenant.Name = "#{Octopus.Deployment.Tenant.Name}"
             Run.Runbook.UsePublishedSnapShot = "True"
             Run.Runbook.Waitforfinish = "False"
         }
