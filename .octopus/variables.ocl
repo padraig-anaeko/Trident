@@ -72,6 +72,7 @@ variable "Project.Database.Report.Path" {
 variable "Project.Loadbalancer.Percent" {
     value "10" {
         environment = ["staging-blue", "staging-green", "production-blue", "production-green"]
+        process = ["runbook/update-load-balancer-canary"]
 
         prompt {
             description = ""
@@ -86,6 +87,7 @@ variable "Project.Loadbalancer.Percent" {
 variable "Project.Loadbalancer.WaitInMinutes" {
     value "10" {
         environment = ["staging-blue", "staging-green", "production-blue", "production-green"]
+        process = ["runbook/update-load-balancer-canary", "deployment-process"]
 
         prompt {
             description = "The delay in minutes before the load balancer is updated again."
