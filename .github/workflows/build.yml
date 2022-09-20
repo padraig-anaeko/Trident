@@ -127,7 +127,7 @@ jobs:
         with:
           api_key: ${{ secrets.OCTOPUSSERVERAPIKEY }}
           server: ${{ secrets.OCTOPUSSERVERURL }}
-          space: $OCTOPUS_SPACE_NAME 
+          space: ${{ env.OCTOPUS_SPACE_NAME }}
           packages: "artifacts/Trident.Database.${{ needs.get-release-information.outputs.VERSION }}.zip,artifacts/Trident.Web.${{ needs.get-release-information.outputs.VERSION }}.zip"
 
       - name: create and deploy release
@@ -135,10 +135,10 @@ jobs:
         with:
           api_key: ${{ secrets.OCTOPUSSERVERAPIKEY }}
           server: ${{ secrets.OCTOPUSSERVERURL }}
-          space: $OCTOPUS_SPACE_NAME
-          project: $OCTOPUS_PROJECT_NAME
+          space: ${{ env.OCTOPUS_SPACE_NAME }}
+          project: ${{ env.OCTOPUS_PROJECT_NAME }}
           channel: ${{ needs.get-release-information.outputs.OCTOPUS_CHANNEL }}
           deploy_to: ${{ needs.get-release-information.outputs.OCTOPUS_ENVIRONMENT }}
           release_number: ${{ needs.get-release-information.outputs.VERSION }}
-          tenant: $OCTOPUS_TENANT_NAME
+          tenant: ${{env.OCTOPUS_TENANT_NAME }}
        
