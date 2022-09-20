@@ -30,11 +30,7 @@ namespace Octopus.Trident.Web.Controllers
 
         public async Task<IActionResult> Index(int currentPage = 1, int rowsPerPage = 10, string sortColumn = "Name", bool isAsc = true)
         {
-            //var allInstances = await _instanceRepository.GetAllAsync(currentPage, rowsPerPage, sortColumn, isAsc);
-            var allInstances = new PagedViewModel<InstanceModel>
-            {
-                Items = new List<InstanceModel>()
-            };
+            var allInstances = await _instanceRepository.GetAllAsync(currentPage, rowsPerPage, sortColumn, isAsc);        
 
             return View(allInstances);
         }

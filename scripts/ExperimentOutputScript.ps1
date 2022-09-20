@@ -10,7 +10,6 @@ Write-Host "$branchName"
 
 $channelName = "Release"
 $environmentName = "Staging - Blue"
-$tenantName = "Internal"
 $versionNumber = $versionPrefix.${env:GITHUB_RUN_NUMBER}
 
 if ($branchName -ne "main")
