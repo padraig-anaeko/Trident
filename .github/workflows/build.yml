@@ -38,17 +38,25 @@ jobs:
           Write-Host "The version prefix is $versionPrefix"
 
           $branchName = (((${env:GITHUB_REF} -replace "refs/heads/", "") -replace "feature/", "") -replace "bugfix/", "") -replace " ", ""
-          Write-Host "$branchName"
+          Write-Host "The Branch Name is: $branchName"
 
-          $channelName = "$OCTOPUS_RELEASE_CHANNEL"
-          $environmentName = "$OCTOPUS_RELEASE_ENVIRONMENT"
-          $versionNumber = $versionPrefix.${env:GITHUB_RUN_NUMBER}
+          $channelName = "${env:OCTOPUS_RELEASE_CHANNEL}"
+          Write-Host "The channel name is now $channelName"
+          $environmentName = "${env:OCTOPUS_RELEASE_ENVIRONMENT}"
+          Write-Host "The environment name is now $environmentName"
+          $versionNumber = "$($versionPrefix).${env:GITHUB_RUN_NUMBER}"
+          Write-Host "The version number is now $versionNumber"
 
           if ($branchName -ne "main")
           {
-              $channelName = "$OCTOPUS_FEATURE_BRANCH_CHANNEL"
-              $environmentName = "$OCTOPUS_FEATURE_BRANCH_ENVIRONMENT"
-              $versionNumber = $versionNumber-$branchName
+              Write-Host "The branch is not the main branch, using the feature branch settings instead."
+              
+              $channelName = "${env:OCTOPUS_FEATURE_BRANCH_CHANNEL}"
+              Write-Host "The channel name is now $channelName"
+              $environmentName = "${env:OCTOPUS_FEATURE_BRANCH_ENVIRONMENT}"
+              Write-Host "The environment name is now $environmentName"
+              $versionNumber = "$versionNumber-$branchName"
+              Write-Host "The version number is now $versionNumber"
           }
 
           Write-Host "Setting the Output Variable OCTOPUS_CHANNEL to $channelName"
