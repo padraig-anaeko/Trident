@@ -141,4 +141,5 @@ jobs:
           deploy_to: ${{ needs.get-release-information.outputs.OCTOPUS_ENVIRONMENT }}
           release_number: ${{ needs.get-release-information.outputs.VERSION }}
           tenant: ${{env.OCTOPUS_TENANT_NAME }}
+          package_version: ${{ needs.get-release-information.outputs.VERSION }}
        
