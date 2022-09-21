@@ -108,7 +108,7 @@ step "auto-approve-database-delta-script" {
     }
 
     action {
-        environments = ["staging-blue", "staging-green"]
+        environments = ["staging"]
         notes = <<-EOT
                 **Runs on Deployments Only**
                 
@@ -136,7 +136,7 @@ step "approve-database-delta-script" {
 
     action {
         action_type = "Octopus.Manual"
-        environments = ["staging-blue", "staging-green"]
+        environments = ["staging"]
         notes = <<-EOT
                 **Runs on Deployments Only**
                 
@@ -258,14 +258,14 @@ step "verify-application" {
 }
 
 step "call-the-canary-deployment-runbook" {
-    name = "Call the Canary Deployment Runbook"
+    name = "Call the Load Balancer Update Runbook"
 
     action {
-        channels = ["hotfix"]
+        channels = ["release"]
         notes = <<-EOT
                 **Always Runs**
                 
-                Call the runbook to update the load balancer slowly instead of swapping 100% of all incoming traffic to the new version of the code.
+                Call the runbook to update the load balancer later to point to the new code.
             EOT
         properties = {
             Octopus.Action.RunOnServer = "true"
@@ -275,17 +275,12 @@ step "call-the-canary-deployment-runbook" {
             Run.Runbook.AutoApproveManualInterventions = "No"
             Run.Runbook.Base.Url = "#{Octopus.Web.ServerUri}"
             Run.Runbook.CancelInSeconds = "1800"
-            Run.Runbook.DateTime = "N/A"
+            Run.Runbook.DateTime = "23:00"
             Run.Runbook.Environment.Name = "#{Octopus.Environment.Name}"
             Run.Runbook.Machines = "N/A"
             Run.Runbook.ManualIntervention.EnvironmentToUse = "#{Octopus.Environment.Name}"
             Run.Runbook.Name = "Update Canary Load Balancer"
             Run.Runbook.Project.Name = "Trident"
-            Run.Runbook.PromptedVariables = <<-EOT
-                Project.Loadbalancer.Percent::#{Project.Loadbalancer.Percent}
-                Project.Loadbalancer.WaitInMinutes::#{Project.Loadbalancer.WaitInMinutes}
-                Project.Loadbalancer.HostToUpdate::#{Project.Tenant.Loadbalancer.HostName}
-            EOT
             Run.Runbook.Space.Name = "#{Octopus.Space.Name}"
             Run.Runbook.UsePublishedSnapShot = "True"
             Run.Runbook.Waitforfinish = "False"
