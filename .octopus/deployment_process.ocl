@@ -275,7 +275,7 @@ step "call-the-canary-deployment-runbook" {
             Run.Runbook.AutoApproveManualInterventions = "No"
             Run.Runbook.Base.Url = "#{Octopus.Web.ServerUri}"
             Run.Runbook.CancelInSeconds = "1800"
-            Run.Runbook.DateTime = "23:00"
+            Run.Runbook.DateTime = "#{Project.Loadbalancer.UpdateTime}"
             Run.Runbook.Environment.Name = "#{Octopus.Environment.Name}"
             Run.Runbook.Machines = "N/A"
             Run.Runbook.ManualIntervention.EnvironmentToUse = "#{Octopus.Environment.Name}"
