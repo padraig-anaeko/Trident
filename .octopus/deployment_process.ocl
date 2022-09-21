@@ -270,7 +270,7 @@ step "call-the-canary-deployment-runbook" {
         properties = {
             Octopus.Action.RunOnServer = "true"
             Octopus.Action.Template.Id = "ActionTemplates-81"
-            Octopus.Action.Template.Version = "0"
+            Octopus.Action.Template.Version = "1"
             Run.Runbook.Api.Key = "#{Project.Runbook.Api.Key}"
             Run.Runbook.AutoApproveManualInterventions = "No"
             Run.Runbook.Base.Url = "#{Octopus.Web.ServerUri}"
