@@ -265,7 +265,7 @@ step "call-the-canary-deployment-runbook" {
         notes = <<-EOT
                 **Always Runs**
                 
-                Call the runbook to update the load balancer later to point to the new code.
+                Call the runbook to update the load balancer during off hours to point to the new code.
             EOT
         properties = {
             Octopus.Action.RunOnServer = "true"
