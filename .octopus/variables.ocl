@@ -55,7 +55,7 @@ variable "Octopus.ServiceNow.ChangeRequest.Number" {
 }
 
 variable "Project.Loadbalancer.UpdateTime" {
-    value "23:00" {
+    value "#{Retail.Loadbalancer.SwapTimeInUtc}" {
         environment = ["staging", "production"]
         process = ["deployment-process"]
 
