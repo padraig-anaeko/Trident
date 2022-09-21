@@ -282,6 +282,7 @@ step "call-the-canary-deployment-runbook" {
             Run.Runbook.Name = "Update Canary Load Balancer"
             Run.Runbook.Project.Name = "Trident"
             Run.Runbook.Space.Name = "#{Octopus.Space.Name}"
+            Run.Runbook.Tenant.Name = "#{Octopus.Deployment.Tenant.Name}"
             Run.Runbook.UsePublishedSnapShot = "True"
             Run.Runbook.Waitforfinish = "False"
         }
