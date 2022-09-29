@@ -5,7 +5,10 @@ on:
     branches: 
       - main
       - 'feature/**'
-      - 'bugfix/**'
+      - 'bugfix/**'  
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    - cron:  '30 5 * * *'
   workflow_dispatch:
 
 env:
@@ -131,6 +134,14 @@ jobs:
           server: ${{ env.OCTOPUS_HOST }}
           space: ${{ env.OCTOPUS_SPACE }}
           packages: "artifacts/Trident.Database.${{ needs.get-release-information.outputs.VERSION }}.zip,artifacts/Trident.Web.${{ needs.get-release-information.outputs.VERSION }}.zip"   
+      
+      - name: push build information to Octopus
+        uses: OctopusDeploy/push-build-information-action@v1
+        with:
+          packages: |
+            Trident.Database
+            Trident.Web
+          version: ${{ needs.get-release-information.outputs.VERSION }}
       
       - name: create and deploy release
         uses: OctopusDeploy/create-release-action@v1.1.1
