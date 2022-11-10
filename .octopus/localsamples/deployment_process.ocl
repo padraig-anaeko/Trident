@@ -16,6 +16,40 @@ step "calculate-deployment-mode" {
     }
 }
 
+step "check-trident-database" {
+    condition = "Variable"
+    name = "Check Trident Database"
+    properties = {
+        Octopus.Step.ConditionVariableExpression = "#{unless Octopus.Deployment.Error}#{Project.Database.RunOnDeploy}#{/unless}"
+    }
+
+    action {
+        notes = <<-EOT
+                **Runs on Deployments Only**
+                
+                Runs the runbook to create the trident database on the current environment's infrastructure.  This can run multiple times, as it checks to see if the database already exists.
+            EOT
+        properties = {
+            Octopus.Action.Template.Id = "ActionTemplates-43"
+            Octopus.Action.Template.Version = "14"
+            Run.Runbook.Api.Key = "#{SQL.Runbook.Api.Key}"
+            Run.Runbook.AutoApproveManualInterventions = "No"
+            Run.Runbook.Base.Url = "https://samples.octopusdemos.app"
+            Run.Runbook.CancelInSeconds = "1800"
+            Run.Runbook.DateTime = "N/A"
+            Run.Runbook.Environment.Name = "#{Octopus.Environment.Name}"
+            Run.Runbook.Machines = "N/A"
+            Run.Runbook.ManualIntervention.EnvironmentToUse = "#{Octopus.Environment.Name}"
+            Run.Runbook.Name = "Prep Trident Database"
+            Run.Runbook.Project.Name = "Trident"
+            Run.Runbook.Space.Name = "#{Octopus.Space.Name}"
+            Run.Runbook.UsePublishedSnapShot = "True"
+            Run.Runbook.Waitforfinish = "True"
+        }
+        worker_pool = "default-worker-pool"
+    }
+}
+
 step "generate-database-delta-report" {
     condition = "Variable"
     name = "Generate Database Delta Report"
@@ -107,6 +141,7 @@ step "approve-database-delta-script" {
             Octopus.Action.Manual.BlockConcurrentDeployments = "False"
             Octopus.Action.Manual.Instructions = "Please approve the database delta script found in the artifacts section."
             Octopus.Action.Manual.ResponsibleTeamIds = "global/octopus-managers"
+            Octopus.Action.RunOnServer = "false"
         }
         worker_pool_variable = ""
     }
@@ -173,6 +208,7 @@ step "deploy-trident-web" {
             Octopus.Action.Package.FeedId = "octopus-server-built-in"
             Octopus.Action.Package.JsonConfigurationVariablesTargets = "appsettings.json"
             Octopus.Action.Package.PackageId = "Trident.Web"
+            Octopus.Action.RunOnServer = "false"
         }
         worker_pool_variable = ""
 
@@ -253,6 +289,7 @@ step "notify-developers-of-status" {
             Octopus.Action.Email.Body = "#{Notification.Body.Text}"
             Octopus.Action.Email.Subject = "#{Notification.Subject.Text}"
             Octopus.Action.Email.ToTeamIds = "trident-notifications"
+            Octopus.Action.RunOnServer = "false"
         }
         worker_pool_variable = ""
     }
