@@ -161,7 +161,7 @@ jobs:
           channel: ${{ needs.get-release-information.outputs.OCTOPUS_CHANNEL }}
           release_number: ${{ needs.get-release-information.outputs.VERSION }}
           package_version: ${{ needs.get-release-information.outputs.VERSION }}
-          git_ref: ${{ env:GITHUB_REF }}
+          git_ref: ${{ env.GITHUB_REF }}
       
       - name: deploy release
         uses: OctopusDeploy/deploy-release-tenanted-action@v3
