@@ -107,7 +107,7 @@ jobs:
         with:
           package_id: Trident.Web
           version: ${{ needs.get-release-information.outputs.VERSION }}  
-          base_path: "$GITHUB_WORKSPACE/artifacts/web"
+          base_path: "artifacts/web"
           files: "**/*"
           output_folder: packaged        
 
@@ -123,7 +123,7 @@ jobs:
         with:
           package_id: Trident.Database
           version: ${{ needs.get-release-information.outputs.VERSION }}  
-          base_path: "$GITHUB_WORKSPACE/artifacts/database"
+          base_path: "artifacts/database"
           files: "**/*"
           output_folder: packaged
     
