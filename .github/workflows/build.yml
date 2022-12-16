@@ -133,6 +133,11 @@ jobs:
           name: assets-for-download
           path: packaged
     
+      - name: install octopus cli
+        uses: OctopusDeploy/install-octopus-cli-action@v1.1.8
+        with:
+          version: latest
+          
       - name: push packages to Octopus
         uses: OctopusDeploy/push-package-action@v1.1.1
         with:
