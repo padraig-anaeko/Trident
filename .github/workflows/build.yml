@@ -135,7 +135,7 @@ jobs:
             "${{ steps.database_package.outputs.package_file_path}}"
       
       - name: push build information to Octopus
-        uses: OctopusDeploy/push-build-information-action@v1
+        uses: OctopusDeploy/push-build-information-action@v3
         with:
           packages: |
             Trident.Database
@@ -151,7 +151,7 @@ jobs:
           package_version: ${{ needs.get-release-information.outputs.VERSION }}
       
       - name: deploy release
-        uses: OctopusDeploy/deploy-release-tenated-action
+        uses: OctopusDeploy/deploy-release-tenated-action@v3
         id: "deploy_release"
         with:
           project: ${{ env.OCTOPUS_PROJECT_NAME }}
