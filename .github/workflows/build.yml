@@ -134,9 +134,12 @@ jobs:
           path: packaged
     
       - name: push packages to Octopus
-        uses: OctopusDeploy/push-package-action@v3
+        uses: OctopusDeploy/push-package-action@v1.1.1
         with:
-          packages: "packaged/**/*.zip"
+          api_key: ${{ env.OCTOPUS_API_KEY }}
+          server: ${{ env.OCTOPUS_URL }}
+          space: ${{ env.OCTOPUS_SPACE }}
+          packages: "packaged/Trident.Database.${{ needs.get-release-information.outputs.VERSION }}.zip,packaged/Trident.Web.${{ needs.get-release-information.outputs.VERSION }}.zip"
       
       - name: push build information to Octopus
         uses: OctopusDeploy/push-build-information-action@v3
