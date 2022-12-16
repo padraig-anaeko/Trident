@@ -91,11 +91,6 @@ jobs:
           mkdir "$GITHUB_WORKSPACE/artifacts/web"
           mkdir "$GITHUB_WORKSPACE/artifacts/database"
 
-      - name: install octopus cli
-        uses: OctopusDeploy/install-octopus-cli-action@v1.1.8
-        with:
-          version: latest
-
       - name: restore dependencies for application
         working-directory: src
         run: dotnet restore
@@ -107,10 +102,14 @@ jobs:
         run: dotnet publish --output "$GITHUB_WORKSPACE/artifacts/web" -c Release --runtime win-x64 --sc false --p:Version=$VERSION_NUMBER
 
       - name: package website
-        env:
-          VERSION_NUMBER: ${{ needs.get-release-information.outputs.VERSION }}  
-        run: |
-          octo pack --id="Trident.Web" --format="Zip" --version="$VERSION_NUMBER" --basePath="$GITHUB_WORKSPACE/artifacts/web" --outFolder="$GITHUB_WORKSPACE/artifacts"
+        id: "website_package"
+        uses: OctopusDeploy/create-zip-package-action@v3
+        with:
+          package_id: Trident.Web
+          version: ${{ needs.get-release-information.outputs.VERSION }}  
+          base_path: "$GITHUB_WORKSPACE/artifacts/web"
+          files: "**/*"
+          output_folder: packaged        
 
       - name: build database
         env:
@@ -118,19 +117,22 @@ jobs:
         working-directory: src/Octopus.Trident.Database.DbUp
         run: dotnet publish --output "$GITHUB_WORKSPACE/artifacts/database" -c Release --runtime win-x64 --sc true --p:PublishSingleFile=true --p:PublishTrimmed=true --p:Version=$VERSION_NUMBER
       
-      - name: package database
-        env:
-          VERSION_NUMBER: ${{ needs.get-release-information.outputs.VERSION }}  
-        run: |
-          octo pack --id="Trident.Database" --format="Zip" --version="$VERSION_NUMBER" --basePath="$GITHUB_WORKSPACE/artifacts/database" --outFolder="$GITHUB_WORKSPACE/artifacts"
-
-      - name: push packages to Octopus
-        uses: OctopusDeploy/push-package-action@v1.1.1
+      - name: package website
+        id: "database_package"
+        uses: OctopusDeploy/create-zip-package-action@v3
         with:
-          api_key: ${{ env.OCTOPUS_API_KEY }}
-          server: ${{ env.OCTOPUS_HOST }}
-          space: ${{ env.OCTOPUS_SPACE }}
-          packages: "artifacts/Trident.Database.${{ needs.get-release-information.outputs.VERSION }}.zip,artifacts/Trident.Web.${{ needs.get-release-information.outputs.VERSION }}.zip"   
+          package_id: Trident.Database
+          version: ${{ needs.get-release-information.outputs.VERSION }}  
+          base_path: "$GITHUB_WORKSPACE/artifacts/database"
+          files: "**/*"
+          output_folder: packaged
+    
+      - name: push packages to Octopus
+        uses: OctopusDeploy/push-package-action@v3
+        with:
+          packages: |
+            "${{ steps.website_package.outputs.package_file_path}}"
+            "${{ steps.database_package.outputs.package_file_path}}"
       
       - name: push build information to Octopus
         uses: OctopusDeploy/push-build-information-action@v1
@@ -140,16 +142,20 @@ jobs:
             Trident.Web
           version: ${{ needs.get-release-information.outputs.VERSION }}
       
-      - name: create and deploy release
-        uses: OctopusDeploy/create-release-action@v1.1.1
+      - name: create release
+        uses: OctopusDeploy/create-release-action@v3
         with:
-          api_key: ${{ env.OCTOPUS_API_KEY }}
-          server: ${{ env.OCTOPUS_HOST }}
-          space: ${{ env.OCTOPUS_SPACE }}
           project: ${{ env.OCTOPUS_PROJECT_NAME }}
           channel: ${{ needs.get-release-information.outputs.OCTOPUS_CHANNEL }}
-          deploy_to: ${{ needs.get-release-information.outputs.OCTOPUS_ENVIRONMENT }}
           release_number: ${{ needs.get-release-information.outputs.VERSION }}
-          tenant: ${{env.OCTOPUS_TENANT_NAME }}
           package_version: ${{ needs.get-release-information.outputs.VERSION }}
+      
+      - name: deploy release
+        uses: OctopusDeploy/deploy-release-tenated-action
+        id: "deploy_release"
+        with:
+          project: ${{ env.OCTOPUS_PROJECT_NAME }}
+          release_number: ${{ needs.get-release-information.outputs.VERSION }}
+          tenant_name: ${{ env.OCTOPUS_TENANT_NAME }}
+          environments: ${{ needs.get-release-information.outputs.OCTOPUS_ENVIRONMENT }}
        
