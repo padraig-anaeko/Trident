@@ -137,7 +137,7 @@ jobs:
         uses: OctopusDeploy/install-octopus-cli-action@v1.1.8
         with:
           version: latest
-          
+
       - name: push packages to Octopus
         uses: OctopusDeploy/push-package-action@v1.1.1
         with:
@@ -161,6 +161,7 @@ jobs:
           channel: ${{ needs.get-release-information.outputs.OCTOPUS_CHANNEL }}
           release_number: ${{ needs.get-release-information.outputs.VERSION }}
           package_version: ${{ needs.get-release-information.outputs.VERSION }}
+          git_ref: ${{ env:GITHUB_REF }}
       
       - name: deploy release
         uses: OctopusDeploy/deploy-release-tenanted-action@v3
