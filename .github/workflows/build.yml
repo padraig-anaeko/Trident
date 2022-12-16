@@ -17,7 +17,7 @@ env:
   OCTOPUS_TENANT_NAME: Internal
   OCTOPUS_SPACE: Octopus Builds
   OCTOPUS_API_KEY: ${{ secrets.OCTOPUSSERVERAPIKEY }}
-  OCTOPUS_HOST: ${{ secrets.OCTOPUSSERVERURL }}
+  OCTOPUS_URL: ${{ secrets.OCTOPUSSERVERURL }}
 
 jobs:
 
