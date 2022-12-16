@@ -130,9 +130,7 @@ jobs:
       - name: push packages to Octopus
         uses: OctopusDeploy/push-package-action@v3
         with:
-          packages: |
-            "${{ steps.website_package.outputs.package_file_path}}"
-            "${{ steps.database_package.outputs.package_file_path}}"
+          packages: "packaged/**/*.zip"
       
       - name: push build information to Octopus
         uses: OctopusDeploy/push-build-information-action@v3
