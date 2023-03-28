@@ -134,7 +134,7 @@ jobs:
           path: packaged
 
       - name: push packages to Octopus
-        uses: OctopusDeploy/OctopusDeploy/push-package-action@v3
+        uses: OctopusDeploy/push-package-action@v3
         with:
           packages: |
             Trident.Database
