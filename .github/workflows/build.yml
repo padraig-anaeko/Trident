@@ -137,8 +137,7 @@ jobs:
         uses: OctopusDeploy/push-package-action@v3
         with:
           packages: |
-            Trident.Database
-            Trident.Web
+            packaged/**/*.zip
       
       - name: push build information to Octopus
         uses: OctopusDeploy/push-build-information-action@v3
