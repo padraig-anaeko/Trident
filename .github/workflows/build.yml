@@ -62,13 +62,13 @@ jobs:
           }
 
           Write-Host "Setting the Output Variable OCTOPUS_CHANNEL to $channelName"
-          echo "::set-output name=OctopusChannelName::$channelName"
+          echo "OctopusChannelName=$channelName" >> $GITHUB_OUTPUT
 
           Write-Host "Setting the Output Variable VERSION to $versionNumber"
-          echo "::set-output name=OctopusVersionNumber::$versionNumber"
+          echo "name=OctopusVersionNumber=$versionNumber" >> $GITHUB_OUTPUT
 
           Write-Host "Setting the Output Variable OCTOPUS_ENVIRONMENT to $environmentName"
-          echo "::set-output name=OctopusEnvironmentName::$environmentName"
+          echo "name=OctopusEnvironmentName=$environmentName" >> $GITHUB_OUTPUT
 
         shell: powershell
   build-and-push-application:
