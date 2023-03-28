@@ -9,13 +9,13 @@ on:
   workflow_dispatch:
 
 env:
-  OCTOPUS_PROJECT_NAME: Trident
+  OCTOPUS_PROJECT_NAME: Trident Original
   OCTOPUS_FEATURE_BRANCH_CHANNEL: Default
   OCTOPUS_FEATURE_BRANCH_ENVIRONMENT: Development
   OCTOPUS_RELEASE_CHANNEL: Release
   OCTOPUS_RELEASE_ENVIRONMENT: Staging
   OCTOPUS_TENANT_NAME: Internal
-  OCTOPUS_SPACE: Octopus Builds
+  OCTOPUS_SPACE: Default
   OCTOPUS_API_KEY: ${{ secrets.OCTOPUSSERVERAPIKEY }}
   OCTOPUS_URL: ${{ secrets.OCTOPUSSERVERURL }}
 
@@ -127,16 +127,11 @@ jobs:
           files: "**/*"
           output_folder: packaged
 
-      - name: Upload artifacts to GitHub for Review
+      - name: Upload artifacts to GitHub
         uses: actions/upload-artifact@v2
         with:
           name: assets-for-download
           path: packaged
-    
-      - name: install octopus cli
-        uses: OctopusDeploy/install-octopus-cli-action@v1.1.8
-        with:
-          version: latest
 
       - name: push packages to Octopus
         uses: OctopusDeploy/push-package-action@v1.1.1
@@ -161,14 +156,12 @@ jobs:
           channel: ${{ needs.get-release-information.outputs.OCTOPUS_CHANNEL }}
           release_number: ${{ needs.get-release-information.outputs.VERSION }}
           package_version: ${{ needs.get-release-information.outputs.VERSION }}
-          git_ref: ${{ env.GITHUB_REF }}
       
       - name: deploy release
-        uses: OctopusDeploy/deploy-release-tenanted-action@v3
+        uses: OctopusDeploy/deploy-release-action@v3
         id: "deploy_release"
         with:
           project: ${{ env.OCTOPUS_PROJECT_NAME }}
           release_number: ${{ needs.get-release-information.outputs.VERSION }}
-          tenant_name: ${{ env.OCTOPUS_TENANT_NAME }}
           environments: ${{ needs.get-release-information.outputs.OCTOPUS_ENVIRONMENT }}
        
