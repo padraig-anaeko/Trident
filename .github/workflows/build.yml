@@ -23,10 +23,6 @@ jobs:
 
   get-release-information:
     runs-on: windows-latest
-    outputs:
-      OCTOPUS_CHANNEL: ${{ steps.step1.outputs.OctopusChannelName }}
-      OCTOPUS_ENVIRONMENT: ${{ steps.step1.outputs.OctopusEnvironmentName }}
-      VERSION: ${{ steps.step1.outputs.OctopusVersionNumber }}
     steps:
       - uses: actions/checkout@v2
       - id: step1
@@ -62,13 +58,13 @@ jobs:
           }
 
           Write-Host "Setting the Output Variable OCTOPUS_CHANNEL to $channelName"
-          echo "OctopusChannelName=$channelName" >> $GITHUB_OUTPUT
+          echo "OCTOPUS_CHANNEL=$channelName" >> $GITHUB_OUTPUT
 
           Write-Host "Setting the Output Variable VERSION to $versionNumber"
-          echo "name=OctopusVersionNumber=$versionNumber" >> $GITHUB_OUTPUT
+          echo "name=OCTOPUS_ENVIRONMENT=$versionNumber" >> $GITHUB_OUTPUT
 
           Write-Host "Setting the Output Variable OCTOPUS_ENVIRONMENT to $environmentName"
-          echo "name=OctopusEnvironmentName=$environmentName" >> $GITHUB_OUTPUT
+          echo "name=VERSION=$environmentName" >> $GITHUB_OUTPUT
 
         shell: powershell
   build-and-push-application:
