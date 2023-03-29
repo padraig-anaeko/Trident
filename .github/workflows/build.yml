@@ -62,13 +62,13 @@ jobs:
           }
 
           Write-Host "Setting the Output Variable OCTOPUS_CHANNEL to $channelName"
-          echo "OCTOPUS_CHANNEL=$channelName" >> $GITHUB_ENV
+          Write-Output "OCTOPUS_CHANNEL=$channelName" >> $Env:GITHUB_OUTPUT
 
           Write-Host "Setting the Output Variable VERSION to $versionNumber"
           Write-Output "APP_VERSION=$versionNumber" >> $Env:GITHUB_OUTPUT
 
           Write-Host "Setting the Output Variable OCTOPUS_ENVIRONMENT to $environmentName"
-          echo "OCTOPUS_ENVIRONMENT=$environmentName" >> $GITHUB_ENV
+          Write-Output "OCTOPUS_ENVIRONMENT=$environmentName" >> $Env:GITHUB_OUTPUT
 
         shell: pwsh
       - name: Setup .NET Core SDK
@@ -86,10 +86,10 @@ jobs:
           echo "${{ steps.ReleaseNum.outputs.APP_VERSION }}"
           
           echo "Channel:"
-          echo "${{ env.OCTOPUS_CHANNEL }}"
+          echo "${{ steps.ReleaseNum.outputs.OCTOPUS_CHANNEL }}"
           
           echo "Environment:"
-          echo "${{ env.OCTOPUS_ENVIRONMENT }}"
+          echo "${{ steps.ReleaseNum.outputs.OCTOPUS_ENVIRONMENT }}"
 
       - name: restore dependencies for application
         working-directory: src
@@ -97,28 +97,28 @@ jobs:
 
       - name: build website           
         working-directory: src/Octopus.Trident.Web
-        run: dotnet publish --output "$GITHUB_WORKSPACE/artifacts/web" -c Release --runtime win-x64 --sc false --p:Version=${{ env.APP_VERSION }}
+        run: dotnet publish --output "$GITHUB_WORKSPACE/artifacts/web" -c Release --runtime win-x64 --sc false --p:Version=${{ steps.ReleaseNum.outputs.APP_VERSION }}
 
       - name: package website
         id: "website_package"
         uses: OctopusDeploy/create-zip-package-action@v3
         with:
           package_id: Trident.Web
-          version: ${{ env.APP_VERSION }}  
+          version: ${{ steps.ReleaseNum.outputs.APP_VERSION }}  
           base_path: "artifacts/web"
           files: "**/*"
           output_folder: packaged        
 
       - name: build database        
         working-directory: src/Octopus.Trident.Database.DbUp
-        run: dotnet publish --output "$GITHUB_WORKSPACE/artifacts/database" -c Release --runtime win-x64 --sc true --p:PublishSingleFile=true --p:PublishTrimmed=true --p:Version=${{ env.APP_VERSION }}
+        run: dotnet publish --output "$GITHUB_WORKSPACE/artifacts/database" -c Release --runtime win-x64 --sc true --p:PublishSingleFile=true --p:PublishTrimmed=true --p:Version=${{ steps.ReleaseNum.outputs.APP_VERSION }}
       
       - name: package website
         id: "database_package"
         uses: OctopusDeploy/create-zip-package-action@v3
         with:
           package_id: Trident.Database
-          version: ${{ env.APP_VERSION }}  
+          version: ${{ steps.ReleaseNum.outputs.APP_VERSION }}  
           base_path: "artifacts/database"
           files: "**/*"
           output_folder: packaged
@@ -141,21 +141,21 @@ jobs:
           packages: |
             Trident.Database
             Trident.Web
-          version: ${{ env.APP_VERSION }}
+          version: ${{ steps.ReleaseNum.outputs.APP_VERSION }}
       
       - name: create release
         uses: OctopusDeploy/create-release-action@v3
         with:
           project: ${{ env.OCTOPUS_PROJECT_NAME }}
-          channel: ${{ env.OCTOPUS_CHANNEL }}
-          release_number: ${{ env.APP_VERSION }}
-          package_version: ${{ env.APP_VERSION }}
+          channel: ${{ steps.ReleaseNum.outputs.OCTOPUS_CHANNEL }}
+          release_number: ${{ steps.ReleaseNum.outputs.APP_VERSION }}
+          package_version: ${{ steps.ReleaseNum.outputs.APP_VERSION }}
       
       - name: deploy release
         uses: OctopusDeploy/deploy-release-action@v3
         id: "deploy_release"
         with:
           project: ${{ env.OCTOPUS_PROJECT_NAME }}
-          release_number: ${{ env.APP_VERSION }}
-          environments: ${{ env.OCTOPUS_ENVIRONMENT }}
+          release_number: ${{ steps.ReleaseNum.outputs.APP_VERSION }}
+          environments: ${{ steps.ReleaseNum.outputs.OCTOPUS_ENVIRONMENT }}
        
