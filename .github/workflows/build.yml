@@ -6,6 +6,14 @@ on:
       - main
   workflow_dispatch:
 
+env:
+  OCTOPUS_PROJECT_NAME: Trident
+  OCTOPUS_CHANNEL: Default
+  OCTOPUS_ENVIRONMENT: Development  
+  OCTOPUS_SPACE: Practitioner
+  OCTOPUS_API_KEY: ${{ secrets.OCTOPUSSERVERAPIKEY }}
+  OCTOPUS_URL: ${{ secrets.OCTOPUSSERVERURL }}
+
 jobs:
 
   build-and-push-application:
@@ -59,4 +67,46 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: assets-for-download
-          path: artifacts     
+          path: artifacts
+          
+      - name: package website
+        id: "website_package"
+        uses: OctopusDeploy/create-zip-package-action@v3
+        with:
+          package_id: Trident.Web
+          version: ${{ steps.ReleaseNum.outputs.APP_VERSION }}  
+          base_path: "artifacts/web"
+          files: "**/*"
+          output_folder: packaged        
+    
+      - name: package database
+        id: "database_package"
+        uses: OctopusDeploy/create-zip-package-action@v3
+        with:
+          package_id: Trident.Database
+          version: ${{ steps.ReleaseNum.outputs.APP_VERSION }}  
+          base_path: "artifacts/database"
+          files: "**/*"
+          output_folder: packaged
+          
+      - name: push packages to Octopus
+        uses: OctopusDeploy/push-package-action@v3
+        with:
+          packages: |
+            packaged/**/*.zip
+            
+      - name: create release
+        uses: OctopusDeploy/create-release-action@v3
+        with:
+          project: ${{ env.OCTOPUS_PROJECT_NAME }}
+          channel: ${{ env.OCTOPUS_CHANNEL }}
+          release_number: ${{ steps.ReleaseNum.outputs.APP_VERSION }}
+          package_version: ${{ steps.ReleaseNum.outputs.APP_VERSION }}
+          
+      - name: deploy release
+        uses: OctopusDeploy/deploy-release-action@v3
+        id: "deploy_release"
+        with:
+          project: ${{ env.OCTOPUS_PROJECT_NAME }}
+          release_number: ${{ steps.ReleaseNum.outputs.APP_VERSION }}
+          environments: ${{ env.OCTOPUS_ENVIRONMENT }}
