@@ -58,13 +58,13 @@ jobs:
           }
 
           Write-Host "Setting the Output Variable OCTOPUS_CHANNEL to $channelName"
-          echo "OCTOPUS_CHANNEL=$channelName" >> $GITHUB_OUTPUT
+          echo "OCTOPUS_CHANNEL=$channelName" >> $GITHUB_ENV
 
           Write-Host "Setting the Output Variable VERSION to $versionNumber"
-          echo "name=OCTOPUS_ENVIRONMENT=$versionNumber" >> $GITHUB_OUTPUT
+          echo "name=OCTOPUS_ENVIRONMENT=$versionNumber" >> $GITHUB_ENV
 
           Write-Host "Setting the Output Variable OCTOPUS_ENVIRONMENT to $environmentName"
-          echo "name=VERSION=$environmentName" >> $GITHUB_OUTPUT
+          echo "name=VERSION=$environmentName" >> $GITHUB_ENV
 
         shell: powershell
   build-and-push-application:
@@ -93,7 +93,7 @@ jobs:
 
       - name: build website
         env:
-          VERSION_NUMBER: ${{ needs.get-release-information.outputs.VERSION }}  
+          VERSION_NUMBER: ${{ env.VERSION }}  
         working-directory: src/Octopus.Trident.Web
         run: dotnet publish --output "$GITHUB_WORKSPACE/artifacts/web" -c Release --runtime win-x64 --sc false --p:Version=$VERSION_NUMBER
 
@@ -102,14 +102,14 @@ jobs:
         uses: OctopusDeploy/create-zip-package-action@v3
         with:
           package_id: Trident.Web
-          version: ${{ needs.get-release-information.outputs.VERSION }}  
+          version: ${{ env.VERSION }}  
           base_path: "artifacts/web"
           files: "**/*"
           output_folder: packaged        
 
       - name: build database
         env:
-          VERSION_NUMBER: ${{ needs.get-release-information.outputs.VERSION }}  
+          VERSION_NUMBER: ${{ env.VERSION }}  
         working-directory: src/Octopus.Trident.Database.DbUp
         run: dotnet publish --output "$GITHUB_WORKSPACE/artifacts/database" -c Release --runtime win-x64 --sc true --p:PublishSingleFile=true --p:PublishTrimmed=true --p:Version=$VERSION_NUMBER
       
@@ -118,7 +118,7 @@ jobs:
         uses: OctopusDeploy/create-zip-package-action@v3
         with:
           package_id: Trident.Database
-          version: ${{ needs.get-release-information.outputs.VERSION }}  
+          version: ${{ env.VERSION }}  
           base_path: "artifacts/database"
           files: "**/*"
           output_folder: packaged
@@ -141,21 +141,21 @@ jobs:
           packages: |
             Trident.Database
             Trident.Web
-          version: ${{ needs.get-release-information.outputs.VERSION }}
+          version: ${{ env.VERSION }}
       
       - name: create release
         uses: OctopusDeploy/create-release-action@v3
         with:
           project: ${{ env.OCTOPUS_PROJECT_NAME }}
-          channel: ${{ needs.get-release-information.outputs.OCTOPUS_CHANNEL }}
-          release_number: ${{ needs.get-release-information.outputs.VERSION }}
-          package_version: ${{ needs.get-release-information.outputs.VERSION }}
+          channel: ${{ env.OCTOPUS_CHANNEL }}
+          release_number: ${{ env.VERSION }}
+          package_version: ${{ env.VERSION }}
       
       - name: deploy release
         uses: OctopusDeploy/deploy-release-action@v3
         id: "deploy_release"
         with:
           project: ${{ env.OCTOPUS_PROJECT_NAME }}
-          release_number: ${{ needs.get-release-information.outputs.VERSION }}
-          environments: ${{ needs.get-release-information.outputs.OCTOPUS_ENVIRONMENT }}
+          release_number: ${{ env.VERSION }}
+          environments: ${{ env.OCTOPUS_ENVIRONMENT }}
        
