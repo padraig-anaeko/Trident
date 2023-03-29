@@ -24,11 +24,10 @@ jobs:
           $projectAsXML = [xml]$projectContents
           $versionPrefix = $projectAsXML.Project.PropertyGroup.VersionPrefix
 
-          Write-Host "The version prefix is $versionPrefix"
-          
+          Write-Host "The version prefix is $versionPrefix"          
           $versionNumber = "$($versionPrefix).${env:GITHUB_RUN_NUMBER}"
+          
           Write-Host "The version number is now $versionNumber"
-
           Write-Host "Setting the Output Variable VERSION to $versionNumber"
           Write-Output "APP_VERSION=$versionNumber" >> $Env:GITHUB_OUTPUT
 
