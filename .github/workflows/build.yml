@@ -64,10 +64,10 @@ jobs:
           echo "OCTOPUS_CHANNEL=$channelName" >> $GITHUB_ENV
 
           Write-Host "Setting the Output Variable VERSION to $versionNumber"
-          echo "name=OCTOPUS_ENVIRONMENT=$versionNumber" >> $GITHUB_ENV
+          echo "VERSION=$versionNumber" >> $GITHUB_ENV
 
           Write-Host "Setting the Output Variable OCTOPUS_ENVIRONMENT to $environmentName"
-          echo "name=VERSION=$environmentName" >> $GITHUB_ENV
+          echo "OCTOPUS_ENVIRONMENT=$environmentName" >> $GITHUB_ENV
 
         shell: pwsh
       - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
