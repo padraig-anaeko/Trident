@@ -85,11 +85,9 @@ jobs:
         working-directory: src
         run: dotnet restore
 
-      - name: build website
-        env:
-          VERSION_NUMBER: ${{ env.VERSION }}  
+      - name: build website           
         working-directory: src/Octopus.Trident.Web
-        run: dotnet publish --output "$GITHUB_WORKSPACE/artifacts/web" -c Release --runtime win-x64 --sc false --p:Version=$VERSION_NUMBER
+        run: dotnet publish --output "$GITHUB_WORKSPACE/artifacts/web" -c Release --runtime win-x64 --sc false --p:Version=${{ env.VERSION }}
 
       - name: package website
         id: "website_package"
@@ -101,11 +99,9 @@ jobs:
           files: "**/*"
           output_folder: packaged        
 
-      - name: build database
-        env:
-          VERSION_NUMBER: ${{ env.VERSION }}  
+      - name: build database        
         working-directory: src/Octopus.Trident.Database.DbUp
-        run: dotnet publish --output "$GITHUB_WORKSPACE/artifacts/database" -c Release --runtime win-x64 --sc true --p:PublishSingleFile=true --p:PublishTrimmed=true --p:Version=$VERSION_NUMBER
+        run: dotnet publish --output "$GITHUB_WORKSPACE/artifacts/database" -c Release --runtime win-x64 --sc true --p:PublishSingleFile=true --p:PublishTrimmed=true --p:Version=${{ env.VERSION }}
       
       - name: package website
         id: "database_package"
