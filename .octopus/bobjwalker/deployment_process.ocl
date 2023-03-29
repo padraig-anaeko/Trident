@@ -204,7 +204,7 @@ step "deploy-trident-web" {
     action {
         action_type = "Octopus.TentaclePackage"
         notes = <<-EOT
-                **Always runs**
+                **Runs on Deployments and Rollbacks**
                 
                 Step to deploy the code and replace the specific configuration values in the appSettings.json file.
             EOT
@@ -234,7 +234,7 @@ step "verify-application" {
     action {
         action_type = "Octopus.Script"
         notes = <<-EOT
-                **Always Runs**
+                **Runs on Deployments and Rollbacks**
                 
                 This step will run a series of tests to ensure the application is running correctly.  If it fails, the guided failure mode will run, where you can manually override the failure and proceed, retry the tests, or fail the deployment.
             EOT
@@ -257,34 +257,25 @@ step "verify-application" {
     }
 }
 
-step "call-the-canary-deployment-runbook" {
-    name = "Call the Load Balancer Update Runbook"
+step "update-load-balancer" {
+    name = "Update Load Balancer"
 
     action {
-        channels = ["release"]
+        action_type = "Octopus.Script"
         notes = <<-EOT
-                **Always Runs**
+                **Runs on Deployments and Rollbacks**
                 
-                Call the runbook to update the load balancer during off hours to point to the new code.
+                This step will update the load balancer to point to the version of the code that is being released.
             EOT
         properties = {
             Octopus.Action.RunOnServer = "true"
-            Octopus.Action.Template.Id = "ActionTemplates-81"
-            Octopus.Action.Template.Version = "2"
-            Run.Runbook.Api.Key = "#{Project.Runbook.Api.Key}"
-            Run.Runbook.AutoApproveManualInterventions = "No"
-            Run.Runbook.Base.Url = "#{Octopus.Web.ServerUri}"
-            Run.Runbook.CancelInSeconds = "1800"
-            Run.Runbook.DateTime = "#{Project.Loadbalancer.UpdateTime}"
-            Run.Runbook.Environment.Name = "#{Octopus.Environment.Name}"
-            Run.Runbook.Machines = "N/A"
-            Run.Runbook.ManualIntervention.EnvironmentToUse = "#{Octopus.Environment.Name}"
-            Run.Runbook.Name = "Update Canary Load Balancer"
-            Run.Runbook.Project.Name = "Trident"
-            Run.Runbook.Space.Name = "#{Octopus.Space.Name}"
-            Run.Runbook.Tenant.Name = "#{Octopus.Deployment.Tenant.Name}"
-            Run.Runbook.UsePublishedSnapShot = "True"
-            Run.Runbook.Waitforfinish = "False"
+            Octopus.Action.Script.ScriptBody = <<-EOT
+                $currentVersion = $OctopusParameters["Octopus.Release.Number"]
+                
+                Write-Highlight "Upading load balancer to point to $currentVersion."
+            EOT
+            Octopus.Action.Script.ScriptSource = "Inline"
+            Octopus.Action.Script.Syntax = "PowerShell"
         }
         worker_pool = "hosted-windows"
     }
@@ -297,7 +288,7 @@ step "notify-developers-of-status" {
     action {
         action_type = "Octopus.Email"
         notes = <<-EOT
-                **Always runs**
+                **Runs on Failure Only**
                 
                 Sends a notification message to anyone in the Trident Notifications email group letting them know the status of this deployment.
             EOT
