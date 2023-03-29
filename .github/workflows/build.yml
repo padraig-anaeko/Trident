@@ -29,7 +29,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - name: Set Release Number
+      - id: ReleaseNum
+        name: Set Release Number
         run: |
           $locationOfProject = "src/Octopus.Trident.Web/Octopus.Trident.Web.csproj"
           $projectContents = Get-Content $locationOfProject
@@ -64,7 +65,7 @@ jobs:
           echo "OCTOPUS_CHANNEL=$channelName" >> $GITHUB_ENV
 
           Write-Host "Setting the Output Variable VERSION to $versionNumber"
-          echo "APP_VERSION=$versionNumber" >> $GITHUB_ENV
+          echo "APP_VERSION=$versionNumber" >> $GITHUB_OUTPUT
 
           Write-Host "Setting the Output Variable OCTOPUS_ENVIRONMENT to $environmentName"
           echo "OCTOPUS_ENVIRONMENT=$environmentName" >> $GITHUB_ENV
@@ -82,7 +83,7 @@ jobs:
           mkdir "$GITHUB_WORKSPACE/artifacts/database"
           
           echo "App Version:"
-          echo "${{ env.APP_VERSION }}"
+          echo "${{ steps.ReleaseNum.outputs.APP_VERSION }}"
           
           echo "Channel:"
           echo "${{ env.OCTOPUS_CHANNEL }}"
