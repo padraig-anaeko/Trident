@@ -65,7 +65,7 @@ jobs:
           echo "OCTOPUS_CHANNEL=$channelName" >> $GITHUB_ENV
 
           Write-Host "Setting the Output Variable VERSION to $versionNumber"
-          echo "APP_VERSION=$versionNumber" >> $GITHUB_OUTPUT
+          Write-Output "APP_VERSION=$versionNumber" >> $Env:GITHUB_OUTPUT
 
           Write-Host "Setting the Output Variable OCTOPUS_ENVIRONMENT to $environmentName"
           echo "OCTOPUS_ENVIRONMENT=$environmentName" >> $GITHUB_ENV
