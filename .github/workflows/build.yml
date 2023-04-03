@@ -126,6 +126,14 @@ jobs:
           packages: |
             packaged/**/*.zip
             
+      - name: push build information to Octopus
+        uses: OctopusDeploy/push-build-information-action@v3
+        with:
+          packages: |
+            Trident.Database
+            Trident.Web
+          version: ${{ steps.ReleaseNum.outputs.APP_VERSION }}
+            
       - name: create release
         uses: OctopusDeploy/create-release-action@v3
         with:
