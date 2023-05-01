@@ -164,7 +164,7 @@ step "verify-application" {
         action_type = "Octopus.Script"
         properties = {
             Octopus.Action.RunOnServer = "true"
-            Octopus.Action.Script.ScriptBody = "Write-Host \"The application has been verified and tested and no issues were found.\""
+            Octopus.Action.Script.ScriptBody = "Write-Host \"The application has been verified and tested.\""
             Octopus.Action.Script.ScriptSource = "Inline"
             Octopus.Action.Script.Syntax = "PowerShell"
         }
