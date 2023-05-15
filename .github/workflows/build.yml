@@ -9,13 +9,12 @@ on:
   workflow_dispatch:
 
 env:
-  OCTOPUS_TENANT_NAME: Internal
   OCTOPUS_PROJECT_NAME: Trident
   OCTOPUS_FEATURE_BRANCH_CHANNEL: Default
   OCTOPUS_FEATURE_BRANCH_ENVIRONMENT: Development
   OCTOPUS_RELEASE_CHANNEL: Release
   OCTOPUS_RELEASE_ENVIRONMENT: Staging  
-  OCTOPUS_SPACE: Practitioner
+  OCTOPUS_SPACE: Demo
   OCTOPUS_API_KEY: ${{ secrets.OCTOPUSSERVERAPIKEY }}
   OCTOPUS_URL: ${{ secrets.OCTOPUSSERVERURL }}
 
@@ -141,13 +140,11 @@ jobs:
           channel: ${{ steps.ReleaseNum.outputs.OCTOPUS_CHANNEL }}
           release_number: ${{ steps.ReleaseNum.outputs.APP_VERSION }}
           package_version: ${{ steps.ReleaseNum.outputs.APP_VERSION }}
-          git_ref: ${{ github.ref }}
       
       - name: deploy release
-        uses: OctopusDeploy/deploy-release-tenanted-action@v3
+        uses: OctopusDeploy/deploy-release-action@v3
         id: "deploy_release"
         with:
           project: ${{ env.OCTOPUS_PROJECT_NAME }}
           release_number: ${{ steps.ReleaseNum.outputs.APP_VERSION }}
           environment: ${{ steps.ReleaseNum.outputs.OCTOPUS_ENVIRONMENT }}
-          tenants: ${{ env.OCTOPUS_TENANT_NAME }}
