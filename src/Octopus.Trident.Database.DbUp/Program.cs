@@ -24,7 +24,7 @@ namespace Octopus.Trident.Database.DbUp
             Console.WriteLine($"The deployment script path is located at {deploymentScriptPath}");
 
             var postDeploymentScriptsPath = Path.Combine(executingPath, "PostDeploymentScripts");
-            Console.WriteLine($"The deployment script path is located at {postDeploymentScriptsPath}");
+            Console.WriteLine($"The post deployment script path is located at {postDeploymentScriptsPath}");
 
             var upgradeEngineBuilder = DeployChanges.To
                 .SqlDatabase(connectionString, null)                
