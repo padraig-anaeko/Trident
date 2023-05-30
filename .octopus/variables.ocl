@@ -33,7 +33,7 @@ variable "Project.Database.Name" {
         environment = ["staging"]
     }
 
-    value "Trident_Testing" {
+    value "Trident_Test" {
         environment = ["test"]
     }
 }
