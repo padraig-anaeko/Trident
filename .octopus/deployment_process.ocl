@@ -190,20 +190,14 @@ step "update-load-balancer" {
 
 step "notify-team-of-deployment-status" {
     condition = "Always"
-    name = "Notify team of deployment status"
+    name = "Notify Team Of Deployment Status"
 
     action {
+        action_type = "Octopus.Email"
         properties = {
-            Octopus.Action.RunOnServer = "true"
-            Octopus.Action.Template.Id = "ActionTemplates-261"
-            Octopus.Action.Template.Version = "15"
-            ssn_Color = "good"
-            ssn_HookUrl = "#{Notification.Slack.Webhook.Url}"
-            ssn_IconUrl = "https://octopus.com/content/resources/favicon.png"
-            ssn_Message = "#{Notification.Body.Text}"
-            ssn_Title = "#{Notification.Subject.Text}"
-            ssn_Username = "Octopus Deploy"
+            Octopus.Action.Email.Body = "#{Notification.Body.Text}"
+            Octopus.Action.Email.Subject = "#{Notification.Subject.Text}"
+            Octopus.Action.Email.ToTeamIds = "developer"
         }
-        worker_pool = "hosted-windows"
     }
 }
