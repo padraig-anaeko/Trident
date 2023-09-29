@@ -8,22 +8,13 @@ on:
       - 'bugfix/**' 
   workflow_dispatch:
 
-<<<<<<< HEAD
-env:
-=======
 env:  
->>>>>>> 0f538773cc0d349c8208abd985b6d13648dfa901
   OCTOPUS_PROJECT_NAME: Trident
   OCTOPUS_FEATURE_BRANCH_CHANNEL: Default
   OCTOPUS_FEATURE_BRANCH_ENVIRONMENT: Development
   OCTOPUS_RELEASE_CHANNEL: Release
-<<<<<<< HEAD
   OCTOPUS_RELEASE_ENVIRONMENT: Test  
   OCTOPUS_SPACE: Default
-=======
-  OCTOPUS_RELEASE_ENVIRONMENT: Staging  
-  OCTOPUS_SPACE: Training
->>>>>>> 0f538773cc0d349c8208abd985b6d13648dfa901
   OCTOPUS_API_KEY: ${{ secrets.OCTOPUSSERVERAPIKEY }}
   OCTOPUS_URL: ${{ secrets.OCTOPUSSERVERURL }}
 
@@ -65,7 +56,6 @@ jobs:
               Write-Host "The channel name is now $channelName"
               $environmentName = "${env:OCTOPUS_FEATURE_BRANCH_ENVIRONMENT}"
               Write-Host "The environment name is now $environmentName"
-<<<<<<< HEAD
                             
               if ($branchName -like "refs/pull*")
               {
@@ -77,11 +67,6 @@ jobs:
                 $versionNumber = "$versionNumber-$branchName"
                 Write-Host "The version number is now $versionNumber"
               }
-=======
-              $versionNumber = "$versionNumber-$branchName"
-              Write-Host "The version number is now $versionNumber"
->>>>>>> 0f538773cc0d349c8208abd985b6d13648dfa901
-          }
 
           Write-Host "Setting the Output Variable OCTOPUS_CHANNEL to $channelName"
           Write-Output "OCTOPUS_CHANNEL=$channelName" >> $Env:GITHUB_OUTPUT
@@ -110,15 +95,7 @@ jobs:
       - name: build website           
         working-directory: src/Octopus.Trident.Web
         run: dotnet publish --output "$GITHUB_WORKSPACE/artifacts/web" -c Release --runtime win-x64 --sc false --p:Version=${{ steps.ReleaseNum.outputs.APP_VERSION }}
-<<<<<<< HEAD
-          
-=======
 
-      - name: build database        
-        working-directory: src/Octopus.Trident.Database.DbUp
-        run: dotnet publish --output "$GITHUB_WORKSPACE/artifacts/database" -c Release --runtime win-x64 --sc true --p:PublishSingleFile=true --p:PublishTrimmed=true --p:Version=${{ steps.ReleaseNum.outputs.APP_VERSION }}                   
-
->>>>>>> 0f538773cc0d349c8208abd985b6d13648dfa901
       - name: package website
         id: "website_package"
         uses: OctopusDeploy/create-zip-package-action@v3
@@ -135,17 +112,10 @@ jobs:
         with:
           package_id: Trident.Database
           version: ${{ steps.ReleaseNum.outputs.APP_VERSION }}  
-<<<<<<< HEAD
           base_path: "db"          
           files: "**/*"
           output_folder: packaged
         
-=======
-          base_path: "artifacts/database"
-          files: "**/*"
-          output_folder: packaged
-      
->>>>>>> 0f538773cc0d349c8208abd985b6d13648dfa901
       - name: Upload artifacts to GitHub
         uses: actions/upload-artifact@v3
         with:
@@ -157,20 +127,13 @@ jobs:
         with:
           packages: |
             packaged/**/*.zip
-<<<<<<< HEAD
-            
-=======
 
->>>>>>> 0f538773cc0d349c8208abd985b6d13648dfa901
       - name: push build information to Octopus
         uses: OctopusDeploy/push-build-information-action@v3
         with:
           packages: |
             Trident.Database
-<<<<<<< HEAD
-=======
             Trident.Web
->>>>>>> 0f538773cc0d349c8208abd985b6d13648dfa901
           version: ${{ steps.ReleaseNum.outputs.APP_VERSION }}
             
       - name: create release
