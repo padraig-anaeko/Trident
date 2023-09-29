@@ -1,9 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <RootNamespace>Octopus.Trident.Web</RootNamespace>
     <VersionPrefix>3.2.1</VersionPrefix>
+    <StartupObject>Octopus.Trident.Web.Program</StartupObject>
   </PropertyGroup>
 
   <ItemGroup>
