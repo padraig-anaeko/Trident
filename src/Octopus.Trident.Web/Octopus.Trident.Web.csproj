@@ -3,8 +3,12 @@
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
     <RootNamespace>Octopus.Trident.Web</RootNamespace>
+<<<<<<< HEAD
     <VersionPrefix>3.2.1</VersionPrefix>
     <StartupObject>Octopus.Trident.Web.Program</StartupObject>
+=======
+    <VersionPrefix>3.3.0</VersionPrefix>
+>>>>>>> 0f538773cc0d349c8208abd985b6d13648dfa901
   </PropertyGroup>
 
   <ItemGroup>

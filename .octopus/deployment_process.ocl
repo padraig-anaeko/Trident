@@ -4,16 +4,16 @@ step "calculate-deployment-mode" {
     action {
         properties = {
             Octopus.Action.RunOnServer = "true"
-            Octopus.Action.Template.Id = "ActionTemplates-207"
+            Octopus.Action.Template.Id = "ActionTemplates-281"
             Octopus.Action.Template.Version = "5"
         }
         worker_pool_variable = ""
     }
 }
 
-step "create-database-via-runbook" {
+step "run-configure-sql-server-runbook" {
     condition = "Variable"
-    name = "Create Database via Runbook"
+    name = "Run Configure SQL Server Runbook"
     properties = {
         Octopus.Step.ConditionVariableExpression = "#{unless Octopus.Deployment.Error}#{Octopus.Action[Calculate Deployment Mode].Output.RunOnDeploy}#{/unless}"
     }
@@ -21,7 +21,7 @@ step "create-database-via-runbook" {
     action {
         properties = {
             Octopus.Action.RunOnServer = "true"
-            Octopus.Action.Template.Id = "ActionTemplates-206"
+            Octopus.Action.Template.Id = "ActionTemplates-264"
             Octopus.Action.Template.Version = "14"
             Run.Runbook.Api.Key = "#{Project.Runbook.Api.Key}"
             Run.Runbook.AutoApproveManualInterventions = "No"
@@ -34,7 +34,6 @@ step "create-database-via-runbook" {
             Run.Runbook.Name = "Configure SQL Server"
             Run.Runbook.Project.Name = "#{Octopus.Project.Name}"
             Run.Runbook.Space.Name = "#{Octopus.Space.Name}"
-            Run.Runbook.Tenant.Name = "#{Octopus.Deployment.Tenant.Name}"
             Run.Runbook.UsePublishedSnapShot = "True"
             Run.Runbook.Waitforfinish = "True"
         }
@@ -57,7 +56,7 @@ step "generate-what-if-report" {
             Database.Deploy.ReportPath = "#{Project.Database.Report.Path}"
             Database.Deploy.WhatIf = "True"
             Octopus.Action.RunOnServer = "true"
-            Octopus.Action.Template.Id = "ActionTemplates-205"
+            Octopus.Action.Template.Id = "ActionTemplates-262"
             Octopus.Action.Template.Version = "0"
         }
         worker_pool = "hosted-windows"
@@ -76,9 +75,9 @@ step "generate-what-if-report" {
     }
 }
 
-step "review-database-changes" {
+step "dba-review-delta-script" {
     condition = "Variable"
-    name = "Review Database Changes"
+    name = "DBA Review Delta Script"
     properties = {
         Octopus.Step.ConditionVariableExpression = "#{unless Octopus.Deployment.Error}#{Octopus.Action[Calculate Deployment Mode].Output.RunOnDeploy}#{/unless}"
     }
@@ -88,10 +87,9 @@ step "review-database-changes" {
         environments = ["staging"]
         properties = {
             Octopus.Action.Manual.BlockConcurrentDeployments = "False"
-            Octopus.Action.Manual.Instructions = "Please review the database changes from the artifact attached to this deployment."
-            Octopus.Action.Manual.ResponsibleTeamIds = "global/octopus-managers,dbas"
+            Octopus.Action.Manual.Instructions = "Please review the delta script that was generated."
+            Octopus.Action.Manual.ResponsibleTeamIds = "dba,global/octopus-managers"
         }
-        tenant_tags = ["Tenant Type/Pseudo"]
     }
 }
 
@@ -110,7 +108,7 @@ step "deploy-database-changes" {
             Database.Deploy.ReportPath = "#{Project.Database.Report.Path}"
             Database.Deploy.WhatIf = "False"
             Octopus.Action.RunOnServer = "true"
-            Octopus.Action.Template.Id = "ActionTemplates-205"
+            Octopus.Action.Template.Id = "ActionTemplates-262"
             Octopus.Action.Template.Version = "0"
         }
         worker_pool = "hosted-windows"
@@ -129,8 +127,8 @@ step "deploy-database-changes" {
     }
 }
 
-step "deploy-trident-website" {
-    name = "Deploy Trident Website"
+step "deploy-trident-web-application" {
+    name = "Deploy Trident Web Application"
     properties = {
         Octopus.Action.TargetRoles = "trident-web"
     }
@@ -141,7 +139,7 @@ step "deploy-trident-website" {
             Octopus.Action.EnabledFeatures = "Octopus.Features.JsonConfigurationVariables"
             Octopus.Action.Package.DownloadOnTentacle = "False"
             Octopus.Action.Package.FeedId = "octopus-server-built-in"
-            Octopus.Action.Package.JsonConfigurationVariablesTargets = "appsettings.json"
+            Octopus.Action.Package.JsonConfigurationVariablesTargets = "appSettings.json"
             Octopus.Action.Package.PackageId = "Trident.Web"
         }
         worker_pool_variable = ""
@@ -164,7 +162,7 @@ step "verify-application" {
         action_type = "Octopus.Script"
         properties = {
             Octopus.Action.RunOnServer = "true"
-            Octopus.Action.Script.ScriptBody = "Write-Host \"The application has been verified and tested.\""
+            Octopus.Action.Script.ScriptBody = "Write-Highlight \"The application has been successfully verified!\""
             Octopus.Action.Script.ScriptSource = "Inline"
             Octopus.Action.Script.Syntax = "PowerShell"
         }
@@ -172,23 +170,34 @@ step "verify-application" {
     }
 }
 
-step "notify-everyone-of-deployment-status" {
-    condition = "Always"
-    name = "Notify everyone of deployment status"
+step "update-load-balancer" {
+    name = "Update Load Balancer to point to new version of application"
 
     action {
-        environments = ["staging", "production"]
+        action_type = "Octopus.Script"
         properties = {
             Octopus.Action.RunOnServer = "true"
-            Octopus.Action.Template.Id = "ActionTemplates-201"
-            Octopus.Action.Template.Version = "15"
-            ssn_Color = "good"
-            ssn_HookUrl = "#{Notification.Slack.Webhook.Url}"
-            ssn_IconUrl = "https://octopus.com/content/resources/favicon.png"
-            ssn_Message = "#{Notification.Body.Text}"
-            ssn_Title = "#{Notification.Subject.Text}"
-            ssn_Username = "Octopus Deploy"
+            Octopus.Action.Script.ScriptBody = <<-EOT
+                $releaseNumber = $OctopusParameters["Octopus.Release.Number"]
+                Write-Highlight "Updated the load balancer to point to version $releaseNumber of the application"
+                EOT
+            Octopus.Action.Script.ScriptSource = "Inline"
+            Octopus.Action.Script.Syntax = "PowerShell"
         }
         worker_pool = "hosted-windows"
+    }
+}
+
+step "notify-team-of-deployment-status" {
+    condition = "Always"
+    name = "Notify Team Of Deployment Status"
+
+    action {
+        action_type = "Octopus.Email"
+        properties = {
+            Octopus.Action.Email.Body = "#{Notification.Body.Text}"
+            Octopus.Action.Email.Subject = "#{Notification.Subject.Text}"
+            Octopus.Action.Email.ToTeamIds = "developer"
+        }
     }
 }
