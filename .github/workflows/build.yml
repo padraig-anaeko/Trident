@@ -13,7 +13,7 @@ env:
   OCTOPUS_FEATURE_BRANCH_CHANNEL: Default
   OCTOPUS_FEATURE_BRANCH_ENVIRONMENT: Development
   OCTOPUS_RELEASE_CHANNEL: Release
-  OCTOPUS_RELEASE_ENVIRONMENT: Test  
+  OCTOPUS_RELEASE_ENVIRONMENT: QA  
   OCTOPUS_SPACE: Default
   OCTOPUS_API_KEY: ${{ secrets.OCTOPUSSERVERAPIKEY }}
   OCTOPUS_URL: ${{ secrets.OCTOPUSSERVERURL }}
@@ -21,7 +21,7 @@ env:
 jobs:
 
   build-and-push-application:
-    runs-on: ubuntu-latest    
+    runs-on: ubuntu-latest        
     strategy:
       matrix:
         dotnet-version: ['7.0.x']
@@ -67,6 +67,7 @@ jobs:
                 $versionNumber = "$versionNumber-$branchName"
                 Write-Host "The version number is now $versionNumber"
               }
+          }
 
           Write-Host "Setting the Output Variable OCTOPUS_CHANNEL to $channelName"
           Write-Output "OCTOPUS_CHANNEL=$channelName" >> $Env:GITHUB_OUTPUT
@@ -95,7 +96,7 @@ jobs:
       - name: build website           
         working-directory: src/Octopus.Trident.Web
         run: dotnet publish --output "$GITHUB_WORKSPACE/artifacts/web" -c Release --runtime win-x64 --sc false --p:Version=${{ steps.ReleaseNum.outputs.APP_VERSION }}
-
+          
       - name: package website
         id: "website_package"
         uses: OctopusDeploy/create-zip-package-action@v3
@@ -127,7 +128,7 @@ jobs:
         with:
           packages: |
             packaged/**/*.zip
-
+            
       - name: push build information to Octopus
         uses: OctopusDeploy/push-build-information-action@v3
         with:
