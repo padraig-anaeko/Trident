@@ -8,8 +8,8 @@
     <ContainerBaseImage>mcr.microsoft.com/dotnet/aspnet:7.0</ContainerBaseImage>
     <ContainerRuntimeIdentifier>linux-x64</ContainerRuntimeIdentifier>
     <ContainerRegistry>ghcr.io</ContainerRegistry>
-    <ContainerImageName>trident</ContainerImageName>
-    <ContainerImageTag>$(Version);latest</ContainerImageTag>
+    <ContainerRepository>trident</ContainerRepository>
+    <ContainerImageTags>$(Version);latest</ContainerImageTags>
     
   </PropertyGroup>
 
