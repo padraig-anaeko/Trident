@@ -66,8 +66,11 @@ jobs:
           Write-Host "Setting the Output Variable OCTOPUS_CHANNEL to $channelName"
           Write-Output "OCTOPUS_CHANNEL=$channelName" >> $Env:GITHUB_OUTPUT
 
-          Write-Host "Setting the Output Variable VERSION to $versionNumber"
-          Write-Output "APP_VERSION=$versionNumber" >> $Env:GITHUB_OUTPUT          
+          Write-Host "Setting the Output Variable APP_VERSION to $versionNumber"
+          Write-Output "APP_VERSION=$versionNumber" >> $Env:GITHUB_OUTPUT  
+          
+          Write-Host "Setting the Output Variable APP_VERSION_PREFIX to $versionNumber"
+          Write-Output "APP_VERSION_PREFIX=$versionPrefix" >> $Env:GITHUB_OUTPUT  
 
         shell: pwsh
       - name: Setup .NET SDK
@@ -126,6 +129,7 @@ jobs:
             dotnet publish -c Release --p:Version=${{ steps.ReleaseNum.outputs.APP_VERSION }} --p:PublishProfile=DefaultContainer
             docker push bobjwalker99/trident:latest
             docker push bobjwalker99/trident:${{ steps.ReleaseNum.outputs.APP_VERSION }}
+            docker push bobjwalker99/trident:${{ steps.ReleaseNum.outputs.APP_VERSION_PREFIX }}
           
       - name: push packages to Octopus
         uses: OctopusDeploy/push-package-action@v3

@@ -8,7 +8,7 @@
     <ContainerBaseImage>mcr.microsoft.com/dotnet/aspnet:7.0</ContainerBaseImage>
     <ContainerRuntimeIdentifier>linux-x64</ContainerRuntimeIdentifier>
     <ContainerRepository>bobjwalker99/trident</ContainerRepository>
-    <ContainerImageTags>$(Version);latest</ContainerImageTags>
+    <ContainerImageTags>$(Version);latest;$(VersionPrefix)</ContainerImageTags>
     
   </PropertyGroup>
 
