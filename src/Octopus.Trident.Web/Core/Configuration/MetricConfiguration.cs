@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using System;
 
 namespace Octopus.Trident.Web.Core.Configuration
 {
@@ -13,7 +14,12 @@ namespace Octopus.Trident.Web.Core.Configuration
 
         public MetricConfiguration(IConfiguration configuration)
         {
-            ConnectionString = configuration["ConnectionStrings:Database"];
+            ConnectionString = Environment.GetEnvironmentVariable("TRIDENT_CONNECTION_STRING");
+            
+            if(string.IsNullOrWhiteSpace(ConnectionString))
+            {
+                ConnectionString = configuration["ConnectionStrings:Database"];
+            }            
         }
     }
 }

@@ -82,11 +82,11 @@ jobs:
 
       - name: restore dependencies for application
         working-directory: src
-        run: dotnet restore
+        run: dotnet restore      
 
       - name: build website           
         working-directory: src/Octopus.Trident.Web
-        run: dotnet publish --output "$GITHUB_WORKSPACE/artifacts/web" -c Release --runtime win-x64 --sc false --p:Version=${{ steps.ReleaseNum.outputs.APP_VERSION }}
+        run: dotnet publish --output "$GITHUB_WORKSPACE/artifacts/web" -c Release --runtime win-x64 --sc false --p:Version=${{ steps.ReleaseNum.outputs.APP_VERSION }}      
           
       - name: package website
         id: "website_package"
@@ -113,6 +113,20 @@ jobs:
         with:
           name: assets-for-download
           path: packaged
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+            registry: ghcr.io
+            username: ${{ github.actor }}
+            password: ${{ secrets.GHCR_PAT }}
+
+      - name: build website container
+        working-directory: src/Octopus.Trident.Web
+        run: | 
+            dotnet publish -c Release --p:Version=${{ steps.ReleaseNum.outputs.APP_VERSION }} --p:PublishProfile=DefaultContainer
+            docker push ghcr.io/bobjwalker/trident:latest
+            docker push ghcr.io/bobjwalker/trident:${{ steps.ReleaseNum.outputs.APP_VERSION }}
           
       - name: push packages to Octopus
         uses: OctopusDeploy/push-package-action@v3
