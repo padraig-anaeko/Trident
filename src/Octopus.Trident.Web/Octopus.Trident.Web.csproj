@@ -6,10 +6,7 @@
     <VersionPrefix>3.2.1</VersionPrefix>
     <StartupObject>Octopus.Trident.Web.Program</StartupObject>
     <ContainerBaseImage>mcr.microsoft.com/dotnet/aspnet:7.0</ContainerBaseImage>
-    <ContainerRuntimeIdentifier>linux-x64</ContainerRuntimeIdentifier>
-    <ContainerRepository>bobjwalker99/trident</ContainerRepository>
-    <ContainerImageTags>$(Version);latest;$(VersionPrefix)</ContainerImageTags>
-    
+    <ContainerRuntimeIdentifier>linux-x64</ContainerRuntimeIdentifier>    
   </PropertyGroup>
 
   <ItemGroup>
