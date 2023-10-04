@@ -126,10 +126,7 @@ jobs:
       - name: build website container
         working-directory: src/Octopus.Trident.Web
         run: | 
-            dotnet publish -c Release --p:Version=${{ steps.ReleaseNum.outputs.APP_VERSION }} --p:PublishProfile=DefaultContainer --p:ContainerRepository=bobjwalker99/trident --p:ContainerImageTags=${{ steps.ReleaseNum.outputs.APP_VERSION }};latest;${{ steps.ReleaseNum.outputs.APP_VERSION_PREFIX }}
-            docker push bobjwalker99/trident:latest
-            docker push bobjwalker99/trident:${{ steps.ReleaseNum.outputs.APP_VERSION }}
-            docker push bobjwalker99/trident:${{ steps.ReleaseNum.outputs.APP_VERSION_PREFIX }}
+            dotnet publish -c Release --p:Version=${{ steps.ReleaseNum.outputs.APP_VERSION }} --p:PublishProfile=DefaultContainer
           
       - name: push packages to Octopus
         uses: OctopusDeploy/push-package-action@v3
