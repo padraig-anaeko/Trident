@@ -119,7 +119,7 @@ jobs:
         with:
             registry: ghcr.io
             username: ${{ secrets.DOCKERHUB_USERNAME }}
-            password: ${{ secrets.DOCKERHUB_PASSWORD }}
+            password: ${{ secrets.DOCKERHUB_PAT }}
 
       - name: build website container
         working-directory: src/Octopus.Trident.Web
