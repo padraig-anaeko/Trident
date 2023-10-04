@@ -7,7 +7,7 @@
     <StartupObject>Octopus.Trident.Web.Program</StartupObject>
     <ContainerBaseImage>mcr.microsoft.com/dotnet/aspnet:7.0</ContainerBaseImage>
     <ContainerRuntimeIdentifier>linux-x64</ContainerRuntimeIdentifier>
-    <ContainerRepository>ghcr.io/bobjwalker/trident</ContainerRepository>
+    <ContainerRepository>bobjwalker99/trident</ContainerRepository>
     <ContainerImageTags>$(Version);latest</ContainerImageTags>
     
   </PropertyGroup>
