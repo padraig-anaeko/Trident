@@ -9,8 +9,7 @@
     <ContainerRuntimeIdentifier>linux-x64</ContainerRuntimeIdentifier>
     <ContainerRegistry>registry.hub.docker.com</ContainerRegistry>
     <ContainerRepository>bobjwalker99/trident</ContainerRepository>
-    <ContainerImageTags>$(Version);latest;$(VersionPrefix)</ContainerImageTags>
-    
+    <ContainerImageTags>$(Version);latest;$(VersionPrefix)</ContainerImageTags>    
   </PropertyGroup>
 
   <ItemGroup>
@@ -35,6 +34,7 @@
   <ItemGroup Label="Container Information">
     <ContainerEnvironmentVariable Include="TRIDENT_CONNECTION_STRING" />
     <ContainerAppCommand Include="dotnet;Trident.Web.dll" />
+    <ContainerPort Include="80" Type="tcp" />
   </ItemGroup>
 
 </Project>

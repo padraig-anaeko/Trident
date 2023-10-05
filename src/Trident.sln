@@ -5,6 +5,16 @@ VisualStudioVersion = 17.7.34031.279
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Trident.Web", "Trident.Web\Trident.Web.csproj", "{DA14AD22-2718-4991-A55B-5A7EE8D6E8AE}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "K8s", "K8s", "{742F9EEC-0930-416A-9EC0-AEB915E0B2F0}"
+	ProjectSection(SolutionItems) = preProject
+		..\k8s\trident-app.yaml = ..\k8s\trident-app.yaml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{BFF58FE3-57AE-40A2-9944-4ADCD2785474}"
+	ProjectSection(SolutionItems) = preProject
+		..\.github\workflows\build.yml = ..\.github\workflows\build.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

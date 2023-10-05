@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: trident-credentials
+type: Opaque
+stringData:
+  connectionString: "blah"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trident-deployment
+  labels:
+    app: trident
+spec:
+  replicas: 1
+  selector:
+    matchLabels: 
+      app: trident
+      template:
+        labels:
+          app: trident
+      spec:
+        containers:
+          - name: trident
+            image: bobjwalker99/trident:latest
+            ports:
+             - containerPort: 8080
+            env:
+             - name: TRIDENT_CONNECTION_STRING
+               valueFrom:
+                 secretKeyRef:
+                   name: trident-credentials
+                   key: connectionString
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: trident-service
+spec:
+  selector:
+    app: trident
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+              
