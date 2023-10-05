@@ -29,7 +29,7 @@ jobs:
       - id: ReleaseNum
         name: Set Release Number
         run: |
-          $locationOfProject = "src/Octopus.Trident.Web/Octopus.Trident.Web.csproj"
+          $locationOfProject = "src/Trident.Web/Trident.Web.csproj"
           $projectContents = Get-Content $locationOfProject
           $projectAsXML = [xml]$projectContents
           $versionPrefix = $projectAsXML.Project.PropertyGroup.VersionPrefix
@@ -88,7 +88,7 @@ jobs:
         run: dotnet restore      
 
       - name: build website           
-        working-directory: src/Octopus.Trident.Web
+        working-directory: src/Trident.Web
         run: dotnet publish --output "$GITHUB_WORKSPACE/artifacts/web" -c Release --runtime win-x64 --sc false --p:Version=${{ steps.ReleaseNum.outputs.APP_VERSION }}      
           
       - name: package website
@@ -125,7 +125,7 @@ jobs:
             password: ${{ secrets.DOCKERHUB_PAT }}
 
       - name: build website container
-        working-directory: src/Octopus.Trident.Web
+        working-directory: src/Trident.Web
         run: | 
             dotnet publish -c Release --p:Version=${{ steps.ReleaseNum.outputs.APP_VERSION }} --p:PublishProfile=DefaultContainer
           
