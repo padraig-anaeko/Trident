@@ -124,10 +124,13 @@ jobs:
             username: ${{ secrets.DOCKERHUB_USERNAME }}
             password: ${{ secrets.DOCKERHUB_PAT }}
 
-      - name: build website container
+      - name: build and push website container
         working-directory: src/Trident.Web
         run: | 
-            dotnet publish -c Release --p:Version=${{ steps.ReleaseNum.outputs.APP_VERSION }} --p:PublishProfile=DefaultContainer
+            docker build --tag bobjwalker99/trident:${{ steps.ReleaseNum.outputs.APP_VERSION }} --tag bobjwalker99/trident:${{ steps.ReleaseNum.outputs.APP_VERSION_PREFIX }} --tag bobjwalker99/trident:latest
+            docker push bobjwalker99/trident:${{ steps.ReleaseNum.outputs.APP_VERSION }} 
+            docker push bobjwalker99/trident:${{ steps.ReleaseNum.outputs.APP_VERSION_PREFIX }} 
+            docker push bobjwalker99/trident:latest
           
       - name: push packages to Octopus
         uses: OctopusDeploy/push-package-action@v3

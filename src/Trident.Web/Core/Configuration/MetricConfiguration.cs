@@ -14,12 +14,7 @@ namespace Trident.Web.Core.Configuration
 
         public MetricConfiguration(IConfiguration configuration)
         {
-            ConnectionString = Environment.GetEnvironmentVariable("TRIDENT_CONNECTION_STRING");
-            
-            if(string.IsNullOrWhiteSpace(ConnectionString))
-            {
-                ConnectionString = configuration["ConnectionStrings:Database"];
-            }            
+            ConnectionString = Environment.GetEnvironmentVariable("TRIDENT_CONNECTION_STRING");                      
         }
     }
 }

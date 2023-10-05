@@ -89,7 +89,7 @@ namespace Trident.Web
         private static void ConfigureLogging(WebApplicationBuilder builder)
         {
             builder.Logging.ClearProviders();
-            builder.Logging.SetMinimumLevel(LogLevel.Information);
+            builder.Logging.SetMinimumLevel(LogLevel.Debug);
         }
     }
 }
