@@ -126,7 +126,7 @@ jobs:
       - name: build and push website container
         working-directory: src
         run: | 
-            docker build ./Trident.Web --tag bobjwalker99/trident:${{ steps.ReleaseNum.outputs.APP_VERSION }} --tag bobjwalker99/trident:${{ steps.ReleaseNum.outputs.APP_VERSION_PREFIX }} --tag bobjwalker99/trident:latest
+            docker build -f "./Trident.Web/Dockerfile" --tag bobjwalker99/trident:${{ steps.ReleaseNum.outputs.APP_VERSION }} --tag bobjwalker99/trident:${{ steps.ReleaseNum.outputs.APP_VERSION_PREFIX }} --tag bobjwalker99/trident:latest .
             docker push bobjwalker99/trident:${{ steps.ReleaseNum.outputs.APP_VERSION }} 
             docker push bobjwalker99/trident:${{ steps.ReleaseNum.outputs.APP_VERSION_PREFIX }} 
             docker push bobjwalker99/trident:latest
