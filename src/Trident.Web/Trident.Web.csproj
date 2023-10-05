@@ -16,6 +16,7 @@
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="8.0.0" />
     <PackageReference Include="Dapper" Version="2.1.4" />
     <PackageReference Include="Dapper.SimpleCRUD" Version="2.3.0" />
+    <PackageReference Include="LigerShark.WebOptimizer.Core" Version="3.0.391" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="7.0.10" />
@@ -34,7 +35,7 @@
   <ItemGroup Label="Container Information">
     <ContainerEnvironmentVariable Include="TRIDENT_CONNECTION_STRING" />
     <ContainerAppCommand Include="dotnet;Trident.Web.dll" />
-    <ContainerPort Include="80" Type="tcp" />
+    <ContainerPort Include="5000" Type="tcp" />
   </ItemGroup>
 
 </Project>
