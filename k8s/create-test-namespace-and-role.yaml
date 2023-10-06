@@ -22,7 +22,7 @@ rules:
         - batch
         - extensions
         - policy
-        - rbac.authorization.k8s.io
+        - rbac.authorization.k8s.io        
     resources:
       - pods
       - componentstatuses
@@ -45,6 +45,7 @@ rules:
       - replicationcontrollers
       - serviceaccounts
       - services
+      - secrets
     verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -58,13 +59,4 @@ subjects:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: octopus-role
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: octopus-test-token
-  namespace: test
-  annotations:
-    kubernetes.io/service-account.name: octopus-test
-type: kubernetes.io/service-account-token
+  name: octopus-test-role

@@ -23,6 +23,7 @@ rules:
         - extensions
         - policy
         - rbac.authorization.k8s.io
+        - secret
     resources:
       - pods
       - componentstatuses
@@ -45,6 +46,7 @@ rules:
       - replicationcontrollers
       - serviceaccounts
       - services
+      - secrets
     verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -58,13 +60,4 @@ subjects:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: octopus-role
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: octopus-prod-token
-  namespace: prod
-  annotations:
-    kubernetes.io/service-account.name: octopus-prod
-type: kubernetes.io/service-account-token
+  name: octopus-prod-role
