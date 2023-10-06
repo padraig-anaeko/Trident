@@ -23,6 +23,7 @@ spec:
       containers:
         - name: trident-web
           image: bobjwalker99/trident:latest
+          imagePullPolicy: "Always"
           ports:
            - containerPort: 5000
              name: http-port
