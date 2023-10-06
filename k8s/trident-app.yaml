@@ -10,23 +10,22 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: trident-deployment
-  labels:
-    app: trident
 spec:
   replicas: 1
   selector:
     matchLabels: 
-      app: trident
+      component: trident-web
   template:
     metadata:
       labels:
-        app: trident
+        component: trident-web
     spec:
       containers:
-        - name: trident
+        - name: trident-web
           image: bobjwalker99/trident:latest
           ports:
            - containerPort: 5000
+             name: http-port
           env:
            - name: TRIDENT_CONNECTION_STRING
              valueFrom:
@@ -37,12 +36,13 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: trident-service
+  name: trident-loadbalancer-service
 spec:
   selector:
-    app: trident
+    component: trident-web
   ports:
-    - protocol: TCP
-      port: 80
+    - port: 5000
       targetPort: 5000
+      name: http-port
+  type: LoadBalancer
               
