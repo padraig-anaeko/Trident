@@ -8,13 +8,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "K8s", "K8s", "{742F9EEC-0930-416A-9EC0-AEB915E0B2F0}"
 	ProjectSection(SolutionItems) = preProject
 		..\k8s\create-dev-namespace-and-role.yaml = ..\k8s\create-dev-namespace-and-role.yaml
-		..\k8s\create-dev-service-account-token.yaml = ..\k8s\create-dev-service-account-token.yaml
-		..\k8s\create-prod-namespace-and-role.yaml = ..\k8s\create-prod-namespace-and-role.yaml
-		..\k8s\create-prod-service-account-token.yaml = ..\k8s\create-prod-service-account-token.yaml
-		..\k8s\create-staging-namespace-and-role.yaml = ..\k8s\create-staging-namespace-and-role.yaml
-		..\k8s\create-staging-service-account-token.yaml = ..\k8s\create-staging-service-account-token.yaml
-		..\k8s\create-test-namespace-and-role.yaml = ..\k8s\create-test-namespace-and-role.yaml
-		..\k8s\create-test-service-account-token.yaml = ..\k8s\create-test-service-account-token.yaml
+		..\k8s\create-namespace.yaml = ..\k8s\create-namespace.yaml
+		..\k8s\create-service-account-and-token.yaml = ..\k8s\create-service-account-and-token.yaml
 		..\k8s\trident-app.yaml = ..\k8s\trident-app.yaml
 	EndProjectSection
 EndProject
