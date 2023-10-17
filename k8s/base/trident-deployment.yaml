@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trident-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels: 
+      component: trident-web
+  template:
+    metadata:
+      labels:
+        component: trident-web
+    spec:
+      containers:
+        - name: trident-web
+          image: bobjwalker99/trident
+          imagePullPolicy: "Always"
+          ports:
+           - containerPort: 5000
+             name: http-port
+          env:
+           - name: TRIDENT_CONNECTION_STRING
+             valueFrom:
+               secretKeyRef:
+                 name: trident-credentials
+                 key: connectionString
