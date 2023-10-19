@@ -6,14 +6,6 @@ resources:
 
 patches:
  - target:
-    kind: Deployment
-    name: trident-deployment
-   path: trident-deployment.yaml
- - target:
-    kind: Service
-    name: trident-app-cluster-ip-service
-   path: trident-app-cluster-ip-service.yaml
- - target:
     kind: Ingress
     name: trident-ingress-nginx
    path: trident-ingress-nginx.yaml
