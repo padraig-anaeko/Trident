@@ -3,12 +3,6 @@ kind: Kustomization
 resources:
 - ../../base
 
-secretGenerator:
-  - name: trident-credentials
-    namespace: production
-    literals:
-      - connectionstring="#{Project.Connection.String}"
-
 patches:
  - target:
     kind: Deployment
