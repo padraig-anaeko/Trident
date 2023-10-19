@@ -3,7 +3,6 @@ kind: Kustomization
 
 secretGenerator:
   - name: trident-credentials
-    namespace: #{Project.K8s.Namespace}
     literals:
       - connectionstring="#{Project.Connection.String}"
 
