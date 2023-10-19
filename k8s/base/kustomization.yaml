@@ -9,4 +9,4 @@ resources:
 secretGenerator:
   - name: trident-credentials
     literals:
-      - connectionstring="#{Project.SQLServer.ConnectionString}"
+      - connectionstring="#{Project.Connection.String}"
