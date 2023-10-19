@@ -1,12 +1,12 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-secretGenerator:
-  - name: trident-credentials
-    literals:
-      - connectionstring="#{Project.Connection.String}"
-
 resources:
 - trident-deployment.yaml
 - trident-app-cluster-ip-service.yaml
 - trident-ingress-nginx.yaml
+
+secretGenerator:
+  - name: trident-credentials
+    literals:
+      - connectionstring="#{Project.Connection.String}"

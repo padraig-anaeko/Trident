@@ -1,6 +1,3 @@
   - op: replace
     path: /spec/rules/0/host
     value: tridentdev.local
-  - op: replace
-    path: /metadata/namespace
-    value: development
