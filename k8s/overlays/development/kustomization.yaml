@@ -3,13 +3,19 @@ kind: Kustomization
 resources:
 - ../../base
 
+secretGenerator:
+  - name: trident-credentials
+    namespace: development
+    literals:
+      - connectionstring="#{Project.Connection.String}"
+
 patches:
  - target:
     kind: Deployment
     name: trident-deployment
    path: trident-deployment.yaml
  - target:
-    kind: ClusterIP
+    kind: Service
     name: trident-app-cluster-ip-service
    path: trident-app-cluster-ip-service.yaml
  - target:
