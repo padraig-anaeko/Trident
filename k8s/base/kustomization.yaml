@@ -9,9 +9,9 @@ resources:
 secretGenerator:
   - name: trident-credentials
     literals:
-      - connectionString="server=localhost;integrated security=true;database=trident"
+      - connectionString="#{Project.Connection.String}"
 
 images:
  - name: bobjwalker99/trident
    newName: bobjwalker99/trident
-   newTag: "latest"
+   newTag: "#{Octopus.Release.Number}"
