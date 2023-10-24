@@ -3,8 +3,6 @@ kind: Kustomization
 
 resources:
 - trident-deployment.yaml
-- trident-app-cluster-ip-service.yaml
-- trident-ingress-nginx.yaml
 
 secretGenerator:
   - name: trident-credentials
