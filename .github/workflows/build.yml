@@ -13,12 +13,14 @@ env:
   OCTOPUS_FEATURE_BRANCH_CHANNEL: Default  
   OCTOPUS_RELEASE_CHANNEL: Release   
   OCTOPUS_SPACE: Default
-  OCTOPUS_API_KEY: ${{ secrets.OCTOPUSSERVERAPIKEY }}
+  OCTOPUS_SERVICE_ACCOUNT_ID: 31344c87-8630-460b-9b4a-86be9abbd557
   OCTOPUS_URL: ${{ secrets.OCTOPUSSERVERURL }}
 
 jobs:
 
   build-and-push-application:
+    permissions:
+      id-token: write
     runs-on: ubuntu-latest        
     strategy:
       matrix:
@@ -130,7 +132,13 @@ jobs:
             docker push bobjwalker99/trident:${{ steps.ReleaseNum.outputs.APP_VERSION }} 
             docker push bobjwalker99/trident:${{ steps.ReleaseNum.outputs.APP_VERSION_PREFIX }} 
             docker push bobjwalker99/trident:latest
-          
+            
+      - name: Login to Octopus Deploy 
+        uses: OctopusDeploy/login@v1
+        with: 
+           server: ${{ env.OCTOPUS_URL }}
+           service_account_id: ${{ env.OCTOPUS_SERVICE_ACCOUNT_ID }}  
+           
       - name: push packages to Octopus
         uses: OctopusDeploy/push-package-action@v3
         with:
