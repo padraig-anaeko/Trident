@@ -14,7 +14,14 @@ spec:
     spec:
       containers:
         - name: trident-web
-          image: bobjwalker99/trident:latest
+          image: bobjwalker99/trident:3.4.0.350
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "250m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
           imagePullPolicy: "Always"
           ports:
            - containerPort: 5000
@@ -24,7 +31,7 @@ spec:
              valueFrom:
                secretKeyRef:
                  name: trident-credentials
-                 key: connectionString
+                 key: connectionString          
 ---
 apiVersion: v1
 kind: Service
