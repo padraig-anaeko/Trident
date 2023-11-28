@@ -4,8 +4,11 @@ on:
   push:
     branches: 
       - main
-      - 'feature/**'
-      - 'bugfix/**' 
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
   workflow_dispatch:
 
 env:  
@@ -13,12 +16,14 @@ env:
   OCTOPUS_FEATURE_BRANCH_CHANNEL: Default  
   OCTOPUS_RELEASE_CHANNEL: Release   
   OCTOPUS_SPACE: Default
-  OCTOPUS_API_KEY: ${{ secrets.OCTOPUSSERVERAPIKEY }}
-  OCTOPUS_URL: ${{ secrets.OCTOPUSSERVERURL }}
+  OCTOPUS_SERVICE_ACCOUNT_ID: 31344c87-8630-460b-9b4a-86be9abbd557
+  OCTOPUS_URL: http://bobjwalker.octopus.app
 
 jobs:
 
   build-and-push-application:
+    permissions:
+      id-token: write
     runs-on: ubuntu-latest        
     strategy:
       matrix:
@@ -83,6 +88,12 @@ jobs:
           mkdir "$GITHUB_WORKSPACE/artifacts"
           mkdir "$GITHUB_WORKSPACE/artifacts/web"        
 
+      - name: Login to Octopus Deploy 
+        uses: OctopusDeploy/login@v1
+        with: 
+           server: ${{ env.OCTOPUS_URL }}
+           service_account_id: ${{ env.OCTOPUS_SERVICE_ACCOUNT_ID }} 
+           
       - name: restore dependencies for application
         working-directory: src
         run: dotnet restore      
@@ -129,8 +140,8 @@ jobs:
             docker build -f "./Trident.Web/Dockerfile" --tag bobjwalker99/trident:${{ steps.ReleaseNum.outputs.APP_VERSION }} --tag bobjwalker99/trident:${{ steps.ReleaseNum.outputs.APP_VERSION_PREFIX }} --tag bobjwalker99/trident:latest .
             docker push bobjwalker99/trident:${{ steps.ReleaseNum.outputs.APP_VERSION }} 
             docker push bobjwalker99/trident:${{ steps.ReleaseNum.outputs.APP_VERSION_PREFIX }} 
-            docker push bobjwalker99/trident:latest
-          
+            docker push bobjwalker99/trident:latest            
+           
       - name: push packages to Octopus
         uses: OctopusDeploy/push-package-action@v3
         with:
