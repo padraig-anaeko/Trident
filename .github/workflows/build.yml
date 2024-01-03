@@ -18,7 +18,7 @@ on:
   workflow_dispatch:
 
 env:  
-  OCTOPUS_PROJECT_NAME: Trident
+  OCTOPUS_PROJECT_NAME: "Trident Manifest File"
   OCTOPUS_FEATURE_BRANCH_CHANNEL: Default  
   OCTOPUS_RELEASE_CHANNEL: Release   
   OCTOPUS_SPACE: Default
@@ -160,6 +160,7 @@ jobs:
           packages: |
             Trident.Database
             Trident.Web
+            Trident
           version: ${{ steps.ReleaseNum.outputs.APP_VERSION }}
             
       - name: create release

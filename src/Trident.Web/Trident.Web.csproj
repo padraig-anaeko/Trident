@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
     <RootNamespace>Trident.Web</RootNamespace>
-    <VersionPrefix>3.5.1</VersionPrefix>
+    <VersionPrefix>3.5.2</VersionPrefix>
     <StartupObject>Trident.Web.Program</StartupObject>     
   </PropertyGroup>
 
