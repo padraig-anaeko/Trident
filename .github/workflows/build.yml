@@ -4,11 +4,17 @@ on:
   push:
     branches: 
       - main
+    paths:
+      - 'src/**'
+      - 'db/**'
   pull_request:
     types:
       - opened
       - reopened
       - synchronize
+    paths:
+      - 'src/**'
+      - 'db/**'
   workflow_dispatch:
 
 env:  
