@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: trident-web
-          image: bobjwalker99/trident:3.4.0.350
+          image: bobjwalker99/trident:3.4.0.357
           resources:
             requests:
               memory: "64Mi"

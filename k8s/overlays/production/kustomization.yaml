@@ -4,6 +4,16 @@ namespace: production
 resources:
 - ../../base
 
+secretGenerator:
+  - name: trident-credentials
+    literals:
+      - connectionString="blah"
+
+images:
+ - name: bobjwalker99/trident
+   newName: bobjwalker99/trident
+   newTag: "3.4.0.357"
+
 patches:
  - target:
     kind: Ingress

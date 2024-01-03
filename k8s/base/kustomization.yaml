@@ -3,13 +3,3 @@ kind: Kustomization
 
 resources:
 - trident-deployment.yaml
-
-secretGenerator:
-  - name: trident-credentials
-    literals:
-      - connectionString="#{Project.Connection.String}"
-
-images:
- - name: bobjwalker99/trident
-   newName: bobjwalker99/trident
-   newTag: "#{Octopus.Release.Number}"
