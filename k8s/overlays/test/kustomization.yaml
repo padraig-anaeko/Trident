@@ -12,7 +12,7 @@ secretGenerator:
 images:
  - name: bobjwalker99/trident
    newName: bobjwalker99/trident
-   newTag: "3.4.0.357"
+   newTag: "3.5.1.360"
 
 patches:
  - target:
